@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: orinote
+  datasource:
+    url: jdbc:postgresql://localhost:5432/orinote
+    username: postgres
+    password: pmdy8PRHFHkJo9
+    driver-class-name: org.postgresql.Driver
+  flyway:
+    enabled: true
+  ai:
+    openai:
+      api-key: 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
+      base-url: https://openrouter.ai/api
+      chat:
+        options:
+          model: mistralai/mistral-small-3.2-24b-instruct:free
