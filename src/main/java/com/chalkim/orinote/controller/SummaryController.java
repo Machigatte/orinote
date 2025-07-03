@@ -7,12 +7,15 @@ import java.util.Optional;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.chalkim.orinote.dto.SummaryCreateDto;
+import com.chalkim.orinote.dto.SummaryUpdateDto;
 import com.chalkim.orinote.model.Summary;
 import com.chalkim.orinote.service.SummaryService;
 
@@ -40,8 +43,8 @@ public class SummaryController {
 
     @Operation(summary = "保存一条总结")
     @PostMapping
-    public Summary saveSummary(@RequestBody Summary summary) {
-        return summaryService.saveSummary(summary);
+    public Summary saveSummary(@RequestBody SummaryCreateDto dto) {
+        return summaryService.saveSummary(dto);
     }
 
     @Operation(summary = "列出所有总结")
@@ -57,9 +60,9 @@ public class SummaryController {
     }
 
     @Operation(summary = "根据ID更新总结")
-    @PostMapping("/{id}")
-    public void updateSummary(@PathVariable Long id, @RequestBody Summary summary) {
-        summaryService.updateSummary(id, summary.getTitle(), summary.getContent());
+    @PatchMapping("/{id}")
+    public void updateSummary(@PathVariable Long id, @RequestBody SummaryUpdateDto dto) {
+        summaryService.updateSummary(id, dto);
     }
 
     @Operation(summary = "根据ID删除总结")

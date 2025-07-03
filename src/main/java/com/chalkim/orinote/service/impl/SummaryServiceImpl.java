@@ -14,6 +14,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.chalkim.orinote.dao.SummaryDao;
+import com.chalkim.orinote.dto.SummaryCreateDto;
+import com.chalkim.orinote.dto.SummaryUpdateDto;
+import com.chalkim.orinote.mapper.SummaryMapper;
 import com.chalkim.orinote.model.Note;
 import com.chalkim.orinote.model.Summary;
 import com.chalkim.orinote.service.NoteService;
@@ -26,13 +29,17 @@ public class SummaryServiceImpl implements SummaryService{
     private final NoteService noteService;
     private final ChatClient chatClient;
 
+    private final SummaryMapper summaryMapper;
+
     @Value("classpath:/prompts/summarize-prompt.st")
     private Resource summarizePrompt;
 
-    public SummaryServiceImpl(SummaryDao summaryDao, NoteService noteService, ChatClient.Builder chatClientBuilder) {
+    public SummaryServiceImpl(SummaryDao summaryDao, NoteService noteService, ChatClient.Builder chatClientBuilder, 
+                              SummaryMapper summaryMapper) {
         this.summaryDao = summaryDao;
         this.noteService = noteService;
         this.chatClient = chatClientBuilder.build();
+        this.summaryMapper = summaryMapper;
     }
 
     private Summary generateSummary(List<Note> notes) {
@@ -60,7 +67,7 @@ public class SummaryServiceImpl implements SummaryService{
             return Optional.empty();
         } else {
             Summary summary = generateSummary(notes);
-            return Optional.of(summaryDao.createSummary(summary.getTitle(), summary.getContent(), summary.getStartAt(), summary.getEndAt()));
+            return Optional.of(summaryDao.createSummary(summaryMapper.summaryToSummaryCreateDto(summary)));
         }
     }
 
@@ -71,8 +78,8 @@ public class SummaryServiceImpl implements SummaryService{
 
     @Override
     @Transactional
-    public Summary saveSummary(Summary summary) {
-        return summaryDao.createSummary(summary.getTitle(), summary.getContent(), summary.getStartAt(), summary.getEndAt());
+    public Summary saveSummary(SummaryCreateDto dto) {
+        return summaryDao.createSummary(dto);
     }
 
     @Override
@@ -87,10 +94,10 @@ public class SummaryServiceImpl implements SummaryService{
 
     @Override
     @Transactional
-    public void updateSummary(Long id, String title, String content) {
+    public void updateSummary(Long id, SummaryUpdateDto dto) {
         Summary existingSummary = summaryDao.getSummaryById(id);
         if (existingSummary != null) {
-            summaryDao.updateSummary(id, title, content);
+            summaryDao.updateSummary(id, dto);
         } else {
             throw new RuntimeException("Summary not found");
         }

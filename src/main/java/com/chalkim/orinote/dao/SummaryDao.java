@@ -1,5 +1,6 @@
 package com.chalkim.orinote.dao;
 
+import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.List;
 
@@ -7,6 +8,8 @@ import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import com.chalkim.orinote.dto.SummaryCreateDto;
+import com.chalkim.orinote.dto.SummaryUpdateDto;
 import com.chalkim.orinote.model.Summary;
 
 @Repository
@@ -17,10 +20,13 @@ public class SummaryDao {
         this.jdbc = jdbc;
     }
 
-    public Summary createSummary(String title, String content, Instant startAt, Instant endAt) {
+    public Summary createSummary(SummaryCreateDto dto) {
         try {
             String sql = "INSERT INTO summaries (title, content, is_deleted, start_at, end_at) VALUES (?, ?, false, ?, ?) RETURNING *";
-            return jdbc.queryForObject(sql, new BeanPropertyRowMapper<>(Summary.class), title, content, startAt, endAt);
+            Timestamp sqlStartAt = Timestamp.from(dto.getStartAt());
+            Timestamp sqlEndAt = Timestamp.from(dto.getEndAt());
+            return jdbc.queryForObject(sql, new BeanPropertyRowMapper<>(Summary.class), dto.getTitle(),
+                    dto.getContent(), sqlStartAt, sqlEndAt);
         } catch (Exception e) {
             throw new RuntimeException("Failed to create summary", e);
         }
@@ -38,7 +44,9 @@ public class SummaryDao {
     public List<Summary> getSummaryCreatedBetween(Instant from, Instant to) {
         try {
             String sql = "SELECT * FROM summaries WHERE created_at BETWEEN ? AND ? AND is_deleted = false ORDER BY created_at DESC";
-            return jdbc.query(sql, new BeanPropertyRowMapper<>(Summary.class), from, to);
+            Timestamp sqlFrom = Timestamp.from(from);
+            Timestamp sqlTo = Timestamp.from(to);
+            return jdbc.query(sql, new BeanPropertyRowMapper<>(Summary.class), sqlFrom, sqlTo);
         } catch (Exception e) {
             throw new RuntimeException("Failed to find summaries by range", e);
         }
@@ -53,10 +61,10 @@ public class SummaryDao {
         }
     }
 
-    public void updateSummary(Long id, String title, String content) {
+    public void updateSummary(Long id, SummaryUpdateDto dto) {
         try {
-            String sql = "UPDATE summaries SET title = ?, content = ?, updated_at = NOW() WHERE id = ? AND is_deleted = false";
-            jdbc.update(sql, title, content, id);
+            String sql = "UPDATE summaries SET title = COALESCE(?, title), content = COALESCE(?, content), updated_at = NOW() WHERE id = ? AND is_deleted = false";
+            jdbc.update(sql, dto.getTitle(), dto.getContent(), id);
         } catch (Exception e) {
             throw new RuntimeException("Failed to update summary", e);
         }

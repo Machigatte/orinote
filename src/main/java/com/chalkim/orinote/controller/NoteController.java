@@ -1,17 +1,27 @@
 package com.chalkim.orinote.controller;
 
-import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.web.bind.annotation.*;
+import java.time.Instant;
+import java.util.List;
+import java.util.Optional;
 
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.chalkim.orinote.dto.NoteCreateDto;
+import com.chalkim.orinote.dto.NoteUpdateDto;
 import com.chalkim.orinote.model.Note;
 import com.chalkim.orinote.service.NoteService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-
-import java.time.Instant;
-import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/notes")
@@ -33,8 +43,8 @@ public class NoteController {
     // POST /notes -> create note
     @Operation(summary = "保存一个笔记")
     @PostMapping
-    public Note saveNote(@RequestBody Note note) {
-        return noteService.saveNote(note);
+    public Note saveNote(@RequestBody NoteCreateDto dto) {
+        return noteService.saveNote(dto);
     }
 
     // GET /notes/{id} -> get note by id
@@ -46,12 +56,11 @@ public class NoteController {
 
     // POST /notes/{id} -> update note by id
     @Operation(summary = "根据ID更新笔记")
-    @PostMapping("/{id}")
+    @PatchMapping("/{id}")
     public void updateNote(
             @PathVariable("id") Long id,
-            @RequestParam("title") String title,
-            @RequestParam("content") String content) {
-        noteService.updateNote(id, title, content);
+            @RequestBody NoteUpdateDto dto) {
+        noteService.updateNote(id, dto);
     }
 
     // DELETE /notes/{id} -> delete note by id

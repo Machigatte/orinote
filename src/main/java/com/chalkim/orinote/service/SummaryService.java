@@ -4,6 +4,8 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
+import com.chalkim.orinote.dto.SummaryCreateDto;
+import com.chalkim.orinote.dto.SummaryUpdateDto;
 import com.chalkim.orinote.model.Summary;
 
 public interface SummaryService {
@@ -19,7 +21,7 @@ public interface SummaryService {
      * @param summary 要保存的总结对象
      * @return 保存后的总结对象
      */
-    Summary saveSummary(Summary summary);
+    Summary saveSummary(SummaryCreateDto dto);
 
     /**
      * 根据 ID 获取总结。
@@ -45,10 +47,9 @@ public interface SummaryService {
     /**
      * 更新总结。
      * @param id 要更新的总结 ID
-     * @param title 新的标题
-     * @param content 新的内容
+     * @param dto 包含更新信息的 DTO 对象
      */
-    void updateSummary(Long id, String title, String content);
+    void updateSummary(Long id, SummaryUpdateDto dto);
 
     /**
      * 逻辑删除总结。

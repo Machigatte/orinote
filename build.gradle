@@ -40,6 +40,10 @@ dependencies {
 	// Spring AI OpenAI
     implementation("org.springframework.ai:spring-ai-openai-spring-boot-starter:1.0.0-M6")
 
+    // MapStruct for DTO mapping
+	implementation 'org.mapstruct:mapstruct:1.6.3'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
+
 	// Test dependencies
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
