@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -43,7 +44,7 @@ public class NoteController {
     // POST /notes -> create note
     @Operation(summary = "保存一个笔记")
     @PostMapping
-    public Note saveNote(@RequestBody NoteCreateDto dto) {
+    public Note saveNote(@RequestBody @Validated NoteCreateDto dto) {
         return noteService.saveNote(dto);
     }
 
@@ -59,7 +60,7 @@ public class NoteController {
     @PatchMapping("/{id}")
     public void updateNote(
             @PathVariable("id") Long id,
-            @RequestBody NoteUpdateDto dto) {
+            @RequestBody @Validated NoteUpdateDto dto) {
         noteService.updateNote(id, dto);
     }
 

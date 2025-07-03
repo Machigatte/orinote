@@ -2,6 +2,7 @@ package com.chalkim.orinote.controller;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.format.annotation.DateTimeFormat;
@@ -44,6 +45,7 @@ public class SummaryController {
     @Operation(summary = "保存一条总结")
     @PostMapping
     public Summary saveSummary(@RequestBody SummaryCreateDto dto) {
+        System.out.println(dto);
         return summaryService.saveSummary(dto);
     }
 
