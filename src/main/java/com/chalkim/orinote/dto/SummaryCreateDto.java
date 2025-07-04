@@ -8,8 +8,12 @@ import lombok.Data;
 
 @Data
 public class SummaryCreateDto {
+    @NotBlank
     private String title;
     private String content;
+
+    @NotNull
     private Instant startAt;
+    @NotNull
     private Instant endAt;
 }

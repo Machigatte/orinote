@@ -67,6 +67,8 @@ public class SummaryServiceImpl implements SummaryService{
             return Optional.empty();
         } else {
             Summary summary = generateSummary(notes);
+            summary.setStartAt(from);
+            summary.setEndAt(to);
             return Optional.of(summaryDao.createSummary(summaryMapper.summaryToSummaryCreateDto(summary)));
         }
     }
