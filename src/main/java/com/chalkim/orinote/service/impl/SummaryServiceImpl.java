@@ -48,7 +48,6 @@ public class SummaryServiceImpl implements SummaryService {
         SystemPromptTemplate systemPromptTemplate = new SystemPromptTemplate(summarizePrompt);
 
         Prompt prompt = systemPromptTemplate.create(Map.of("notes", notes));
-        ;
 
         System.out.println("Prompt: " + prompt);
 
@@ -64,16 +63,20 @@ public class SummaryServiceImpl implements SummaryService {
 
     @Override
     @Transactional
-    public Optional<Summary> generateSummaryBetween(Instant from, Instant to) {
+    public Summary generateSummaryBetween(Instant from, Instant to) {
+        if (from.isAfter(to)) {
+            throw new IllegalArgumentException("'from' must be before 'to'");
+        }
+
         List<Note> notes = noteService.getNotesBetween(from, to);
         if (notes.isEmpty()) {
-            return Optional.empty();
-        } else {
-            Summary summary = generateSummary(notes);
-            summary.setStartAt(from);
-            summary.setEndAt(to);
-            return Optional.of(summaryDao.createSummary(summaryMapper.summaryToSummaryCreateDto(summary)));
+            throw new IllegalArgumentException("No notes found between " + from + " and " + to);
         }
+
+        Summary summary = generateSummary(notes);
+        summary.setStartAt(from);
+        summary.setEndAt(to);
+        return summaryDao.createSummary(summaryMapper.summaryToSummaryCreateDto(summary));
     }
 
     @Override
@@ -98,13 +101,13 @@ public class SummaryServiceImpl implements SummaryService {
 
     @Override
     @Transactional
-    public void updateSummary(Long id, SummaryUpdateDto dto) {
-        Summary existingSummary = summaryDao.getSummaryById(id);
-        if (existingSummary != null) {
-            summaryDao.updateSummary(id, dto);
-        } else {
+    public void patchSummary(Long id, SummaryUpdateDto dto) {
+        boolean exists = summaryDao.existsById(id);
+        if (!exists) {
             throw new SummaryNotFoundException("Summary with ID " + id + " not found");
         }
+
+        summaryDao.updateSummary(id, dto);
     }
 
     @Override
@@ -118,6 +121,9 @@ public class SummaryServiceImpl implements SummaryService {
 
     @Override
     public List<Summary> getSummaryCreatedBetween(Instant from, Instant to) {
+        if (from.isAfter(to)) {
+            throw new IllegalArgumentException("'from' must be before 'to'");
+        }
         return summaryDao.getSummaryCreatedBetween(from, to);
     }
 }

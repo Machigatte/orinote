@@ -3,11 +3,11 @@ package com.chalkim.orinote.controller;
 import java.net.URI;
 import java.time.Instant;
 import java.util.List;
-import java.util.Optional;
 
-import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -16,7 +16,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.chalkim.orinote.dto.NoteCreateDto;
 import com.chalkim.orinote.dto.NoteUpdateDto;
@@ -27,11 +29,15 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @RestController
 @RequestMapping("/notes")
+@Validated
 @Tag(name = "Note API", description = "管理笔记的增删查改接口")
 public class NoteController {
     private final NoteService noteService;
@@ -43,8 +49,8 @@ public class NoteController {
     // GET /notes -> liot all notes
     @Operation(summary = "列出所有笔记")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "成功返回笔记列表"),
-            @ApiResponse(responseCode = "500", description = "服务器内部错误")
+            @ApiResponse(responseCode = "200", description = "成功返回笔记列表", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = Note.class)))),
+            @ApiResponse(responseCode = "500", description = "服务器内部错误", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping
     public List<Note> getAllNotes() {
@@ -54,46 +60,72 @@ public class NoteController {
     // POST /notes -> create note
     @Operation(summary = "保存一个笔记")
     @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "成功创建笔记"),
-            @ApiResponse(responseCode = "400", description = "请求参数无效", content = @Content(schema = @Schema(implementation = org.springframework.web.ErrorResponse.class))),
-            @ApiResponse(responseCode = "500", description = "服务器内部错误", content = @Content(schema = @Schema(implementation = org.springframework.web.ErrorResponse.class)))
+            @ApiResponse(responseCode = "201", description = "成功创建笔记", content = @Content(mediaType = "application/json", schema = @Schema(implementation = Note.class))),
+            @ApiResponse(responseCode = "400", description = "请求参数无效", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "服务器内部错误", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PostMapping
-    public ResponseEntity<Note> saveNote(@RequestBody @Validated NoteCreateDto dto) {
+    public ResponseEntity<Note> saveNote(@RequestBody @Valid NoteCreateDto dto) {
         Note saved = noteService.saveNote(dto);
-        URI location = URI.create("/notes/" + saved.getId());
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(saved.getId())
+                .toUri();
         return ResponseEntity.created(location).body(saved);
     }
 
     // GET /notes/{id} -> get note by id
-    @Operation(summary = "根据ID获取笔记")
+    @Operation(summary = "根据ID获取笔记", description = "通过笔记ID获取笔记详情")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "成功返回笔记详情", content = @Content(mediaType = "application/json", schema = @Schema(implementation = Note.class))),
+            @ApiResponse(responseCode = "404", description = "未找到指定ID的笔记", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "服务器内部错误", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
     @GetMapping("/{id}")
     public Note getNotaById(@PathVariable("id") Long id) {
         return noteService.getNoteById(id);
     }
 
     // POST /notes/{id} -> update note by id
-    @Operation(summary = "根据ID更新笔记")
+    @Operation(summary = "根据ID更新笔记", description = "更新指定ID的笔记")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "成功更新笔记"),
+            @ApiResponse(responseCode = "400", description = "请求参数无效", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "未找到指定ID的笔记", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "服务器内部错误", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
     @PatchMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateNote(
             @PathVariable("id") Long id,
-            @RequestBody @Validated NoteUpdateDto dto) {
-        noteService.updateNote(id, dto);
+            @RequestBody @Valid NoteUpdateDto dto) {
+        noteService.patchNote(id, dto);
     }
 
     // DELETE /notes/{id} -> delete note by id
-    @Operation(summary = "根据ID删除笔记")
+    @Operation(summary = "根据ID删除笔记", description = "软删除指定ID的笔记")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "成功删除笔记"),
+            @ApiResponse(responseCode = "404", description = "未找到指定ID的笔记", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "服务器内部错误", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
     @DeleteMapping("/{id}")
     public void softDeleteNote(@PathVariable("id") Long id) {
         noteService.softDeleteNote(id);
     }
 
     // GET /notes/range?from=...&to=... -> get notes in range
-    @Operation(summary = "获取指定时间范围内的笔记")
+    @Operation(summary = "获取指定时间范围内的笔记", description = "返回指定时间范围内的笔记列表")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "成功返回笔记列表", content = @Content(mediaType = "application/json", schema = @Schema(implementation = Note.class))),
+            @ApiResponse(responseCode = "400", description = "请求参数无效", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "服务器内部错误", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
     @GetMapping("/range")
     public List<Note> getNotesBetween(
-            @RequestParam("from") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant from,
-            @RequestParam("to") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant to) {
+            @RequestParam("from") @NotNull Instant from,
+            @RequestParam("to") @NotNull Instant to) {
         return noteService.getNotesBetween(from, to);
     }
 }

@@ -20,6 +20,12 @@ public class SummaryDao {
         this.jdbc = jdbc;
     }
 
+    public boolean existsById(Long id) {
+        String sql = "SELECT COUNT(*) FROM summaries WHERE id = ? AND is_deleted = false";
+        Integer count = jdbc.queryForObject(sql, Integer.class, id);
+        return count != null && count > 0;
+    }
+
     public Summary createSummary(SummaryCreateDto dto) {
         String sql = "INSERT INTO summaries (title, content, is_deleted, start_at, end_at) VALUES (?, ?, false, ?, ?) RETURNING *";
         Timestamp sqlStartAt = Timestamp.from(dto.getStartAt());
@@ -45,9 +51,9 @@ public class SummaryDao {
         return jdbc.query(sql, new BeanPropertyRowMapper<>(Summary.class));
     }
 
-    public void updateSummary(Long id, SummaryUpdateDto dto) {
+    public int updateSummary(Long id, SummaryUpdateDto dto) {
         String sql = "UPDATE summaries SET title = COALESCE(?, title), content = COALESCE(?, content), updated_at = NOW() WHERE id = ? AND is_deleted = false";
-        jdbc.update(sql, dto.getTitle(), dto.getContent(), id);
+        return jdbc.update(sql, dto.getTitle(), dto.getContent(), id);
     }
 
     public int softDeleteSummary(Long id) {

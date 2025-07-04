@@ -44,7 +44,7 @@ public interface NoteService {
      * @param title 新标题
      * @param content 新内容
      */
-    void updateNote(Long id, NoteUpdateDto updateDto);
+    void patchNote(Long id, NoteUpdateDto updateDto);
 
     /**
      * 逻辑删除笔记

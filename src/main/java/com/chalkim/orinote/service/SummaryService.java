@@ -2,7 +2,6 @@ package com.chalkim.orinote.service;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.Optional;
 
 import com.chalkim.orinote.dto.SummaryCreateDto;
 import com.chalkim.orinote.dto.SummaryUpdateDto;
@@ -14,7 +13,7 @@ public interface SummaryService {
      * @param notes 要生成总结的笔记列表
      * @return 生成的总结对象
      */
-    Optional<Summary> generateSummaryBetween(Instant from, Instant to);
+    Summary generateSummaryBetween(Instant from, Instant to);
 
     /**
      * 保存一条手动输入的总结。
@@ -49,7 +48,7 @@ public interface SummaryService {
      * @param id 要更新的总结 ID
      * @param dto 包含更新信息的 DTO 对象
      */
-    void updateSummary(Long id, SummaryUpdateDto dto);
+    void patchSummary(Long id, SummaryUpdateDto dto);
 
     /**
      * 逻辑删除总结。

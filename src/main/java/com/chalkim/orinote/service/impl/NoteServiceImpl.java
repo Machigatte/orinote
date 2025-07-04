@@ -44,18 +44,21 @@ public class NoteServiceImpl implements NoteService {
 
     @Override
     public List<Note> getNotesBetween(Instant from, Instant to) {
+        if (from.isAfter(to)) {
+            throw new IllegalArgumentException("'from' must be before 'to'");
+        }
         return noteDao.getNotesCreatedBetween(from, to);
     }
 
     @Override
     @Transactional
-    public void updateNote(Long id, NoteUpdateDto dto) {
-        Note existingNote = noteDao.getNoteById(id);
-        if (existingNote != null) {
-            noteDao.updateNote(id, dto);
-        } else {
+    public void patchNote(Long id, NoteUpdateDto dto) {
+        boolean exists = noteDao.existsById(id);
+        if (!exists) {
             throw new NoteNotFoundException("Note with ID " + id + " not found");
         }
+
+        noteDao.updateNote(id, dto);
     }
 
     @Override

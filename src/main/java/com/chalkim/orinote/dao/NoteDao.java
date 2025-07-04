@@ -20,6 +20,12 @@ public class NoteDao {
         this.jdbc = jdbc;
     }
 
+    public boolean existsById(Long id) {
+        String sql = "SELECT COUNT(*) FROM notes WHERE id = ? AND is_deleted = false";
+        Integer count = jdbc.queryForObject(sql, Integer.class, id);
+        return count != null && count > 0;
+    }
+
     public Note createNote(NoteCreateDto dto) {
         String sql = "INSERT INTO notes (title, content, is_deleted, created_at, updated_at) VALUES (?, ?, false, NOW(), NOW()) RETURNING *";
         return jdbc.queryForObject(sql, new BeanPropertyRowMapper<>(Note.class), dto.getTitle(), dto.getContent());
@@ -42,9 +48,9 @@ public class NoteDao {
         return jdbc.query(sql, new BeanPropertyRowMapper<>(Note.class));
     }
 
-    public void updateNote(Long id, NoteUpdateDto dto) {
+    public int updateNote(Long id, NoteUpdateDto dto) {
         String sql = "UPDATE notes SET title = COALESCE(?, title), content = COALESCE(?, content), updated_at = NOW() WHERE id = ? AND is_deleted = false";
-        jdbc.update(sql, dto.getTitle(), dto.getContent(), id);
+        return jdbc.update(sql, dto.getTitle(), dto.getContent(), id);
     }
 
     public int softDeleteNote(Long id) {
