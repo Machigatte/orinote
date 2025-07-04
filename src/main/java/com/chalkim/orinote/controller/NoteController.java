@@ -4,6 +4,8 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -28,6 +30,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RequestMapping("/notes")
 @Tag(name = "Note API", description = "管理笔记的增删查改接口")
 public class NoteController {
+    private static final Logger log = LoggerFactory.getLogger(NoteController.class);
+
     private final NoteService noteService;
 
     public NoteController(NoteService noteService) {
