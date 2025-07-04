@@ -4,8 +4,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
-import com.chalkim.orinote.dto.NoteCreateDto;
-import com.chalkim.orinote.dto.NoteUpdateDto;
+import com.chalkim.orinote.dto.NoteDto;
 import com.chalkim.orinote.model.Note;
 
 public interface NoteService {
@@ -15,7 +14,7 @@ public interface NoteService {
      * @param note 要创建的笔记对象
      * @return 创建的笔记对象
      */
-    Note saveNote(NoteCreateDto dto);
+    Note saveNote(NoteDto dto);
 
     /**
      * 根据ID获取笔记
@@ -44,7 +43,7 @@ public interface NoteService {
      * @param title 新标题
      * @param content 新内容
      */
-    void patchNote(Long id, NoteUpdateDto updateDto);
+    void patchNote(Long id, NoteDto updateDto);
 
     /**
      * 逻辑删除笔记

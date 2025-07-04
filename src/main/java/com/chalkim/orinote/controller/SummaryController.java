@@ -50,7 +50,6 @@ public class SummaryController {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "成功生成总结", content = @Content(mediaType = "application/json", schema = @Schema(implementation = Summary.class))),
             @ApiResponse(responseCode = "400", description = "请求参数无效", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
-            @ApiResponse(responseCode = "500", description = "服务器内部错误", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping("/generate")
     public Summary generateSummaryBetween(
@@ -63,7 +62,6 @@ public class SummaryController {
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "成功创建总结", content = @Content(mediaType = "application/json", schema = @Schema(implementation = Summary.class))),
             @ApiResponse(responseCode = "400", description = "请求参数无效", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
-            @ApiResponse(responseCode = "500", description = "服务器内部错误", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PostMapping
     public ResponseEntity<Summary> saveSummary(@RequestBody @Valid SummaryCreateDto dto) {
@@ -79,7 +77,6 @@ public class SummaryController {
     @Operation(summary = "列出所有总结", description = "返回所有总结的列表")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "成功返回总结列表", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = Summary.class)))),
-            @ApiResponse(responseCode = "500", description = "服务器内部错误", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping
     public List<Summary> getAllSummaries() {
@@ -90,7 +87,6 @@ public class SummaryController {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "成功返回总结详情", content = @Content(mediaType = "application/json", schema = @Schema(implementation = Summary.class))),
             @ApiResponse(responseCode = "404", description = "未找到指定ID的总结", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
-            @ApiResponse(responseCode = "500", description = "服务器内部错误", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping("/{id}")
     public Summary getSummaryById(@PathVariable("id") Long id) {
@@ -102,7 +98,6 @@ public class SummaryController {
             @ApiResponse(responseCode = "204", description = "成功更新总结"),
             @ApiResponse(responseCode = "400", description = "请求参数无效", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "404", description = "未找到指定ID的总结", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
-            @ApiResponse(responseCode = "500", description = "服务器内部错误", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PatchMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -114,7 +109,6 @@ public class SummaryController {
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "成功删除总结"),
             @ApiResponse(responseCode = "404", description = "未找到指定ID的总结", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
-            @ApiResponse(responseCode = "500", description = "服务器内部错误", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     @DeleteMapping("/{id}")
     public void softDeleteSummary(@PathVariable("id") Long id) {
@@ -125,7 +119,6 @@ public class SummaryController {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "成功返回总结列表", content = @Content(mediaType = "application/json", schema = @Schema(implementation = Summary.class))),
             @ApiResponse(responseCode = "400", description = "请求参数无效", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
-            @ApiResponse(responseCode = "500", description = "服务器内部错误", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping("/range")
     public List<Summary> getSummariesBetween(

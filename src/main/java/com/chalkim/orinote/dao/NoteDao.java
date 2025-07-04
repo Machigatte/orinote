@@ -8,8 +8,7 @@ import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-import com.chalkim.orinote.dto.NoteCreateDto;
-import com.chalkim.orinote.dto.NoteUpdateDto;
+import com.chalkim.orinote.dto.NoteDto;
 import com.chalkim.orinote.model.Note;
 
 @Repository
@@ -26,7 +25,7 @@ public class NoteDao {
         return count != null && count > 0;
     }
 
-    public Note createNote(NoteCreateDto dto) {
+    public Note createNote(NoteDto dto) {
         String sql = "INSERT INTO notes (title, content, is_deleted, created_at, updated_at) VALUES (?, ?, false, NOW(), NOW()) RETURNING *";
         return jdbc.queryForObject(sql, new BeanPropertyRowMapper<>(Note.class), dto.getTitle(), dto.getContent());
     }
@@ -48,7 +47,7 @@ public class NoteDao {
         return jdbc.query(sql, new BeanPropertyRowMapper<>(Note.class));
     }
 
-    public int updateNote(Long id, NoteUpdateDto dto) {
+    public int updateNote(Long id, NoteDto dto) {
         String sql = "UPDATE notes SET title = COALESCE(?, title), content = COALESCE(?, content), updated_at = NOW() WHERE id = ? AND is_deleted = false";
         return jdbc.update(sql, dto.getTitle(), dto.getContent(), id);
     }

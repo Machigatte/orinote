@@ -12,8 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import com.chalkim.orinote.dao.NoteDao;
-import com.chalkim.orinote.dto.NoteCreateDto;
-import com.chalkim.orinote.dto.NoteUpdateDto;
+import com.chalkim.orinote.dto.NoteDto;
 import com.chalkim.orinote.exception.NoteNotFoundException;
 import com.chalkim.orinote.model.Note;
 import com.chalkim.orinote.service.NoteService;
@@ -29,7 +28,7 @@ public class NoteServiceImpl implements NoteService {
 
     @Override
     @Transactional
-    public Note saveNote(@Valid @NotNull NoteCreateDto dto) {
+    public Note saveNote(@Valid @NotNull NoteDto dto) {
         return noteDao.createNote(dto);
     }
 
@@ -57,7 +56,7 @@ public class NoteServiceImpl implements NoteService {
 
     @Override
     @Transactional
-    public void patchNote(@NotNull Long id, @Valid @NotNull NoteUpdateDto dto) {
+    public void patchNote(@NotNull Long id, @Valid @NotNull NoteDto dto) {
         boolean exists = noteDao.existsById(id);
         if (!exists) {
             throw new NoteNotFoundException("Note with ID " + id + " not found");

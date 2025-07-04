@@ -20,8 +20,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import com.chalkim.orinote.dto.NoteCreateDto;
-import com.chalkim.orinote.dto.NoteUpdateDto;
+import com.chalkim.orinote.dto.NoteDto;
 import com.chalkim.orinote.model.Note;
 import com.chalkim.orinote.service.NoteService;
 
@@ -50,7 +49,6 @@ public class NoteController {
     @Operation(summary = "列出所有笔记")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "成功返回笔记列表", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = Note.class)))),
-            @ApiResponse(responseCode = "500", description = "服务器内部错误", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping
     public List<Note> getAllNotes() {
@@ -62,10 +60,9 @@ public class NoteController {
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "成功创建笔记", content = @Content(mediaType = "application/json", schema = @Schema(implementation = Note.class))),
             @ApiResponse(responseCode = "400", description = "请求参数无效", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
-            @ApiResponse(responseCode = "500", description = "服务器内部错误", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PostMapping
-    public ResponseEntity<Note> saveNote(@RequestBody @Valid NoteCreateDto dto) {
+    public ResponseEntity<Note> saveNote(@RequestBody @Valid NoteDto dto) {
         Note saved = noteService.saveNote(dto);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
@@ -80,7 +77,6 @@ public class NoteController {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "成功返回笔记详情", content = @Content(mediaType = "application/json", schema = @Schema(implementation = Note.class))),
             @ApiResponse(responseCode = "404", description = "未找到指定ID的笔记", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
-            @ApiResponse(responseCode = "500", description = "服务器内部错误", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping("/{id}")
     public Note getNotaById(@PathVariable("id") Long id) {
@@ -93,13 +89,12 @@ public class NoteController {
             @ApiResponse(responseCode = "204", description = "成功更新笔记"),
             @ApiResponse(responseCode = "400", description = "请求参数无效", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "404", description = "未找到指定ID的笔记", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
-            @ApiResponse(responseCode = "500", description = "服务器内部错误", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PatchMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateNote(
             @PathVariable("id") Long id,
-            @RequestBody @Valid NoteUpdateDto dto) {
+            @RequestBody @Valid NoteDto dto) {
         noteService.patchNote(id, dto);
     }
 
@@ -108,7 +103,6 @@ public class NoteController {
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "成功删除笔记"),
             @ApiResponse(responseCode = "404", description = "未找到指定ID的笔记", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
-            @ApiResponse(responseCode = "500", description = "服务器内部错误", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     @DeleteMapping("/{id}")
     public void softDeleteNote(@PathVariable("id") Long id) {
@@ -120,7 +114,6 @@ public class NoteController {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "成功返回笔记列表", content = @Content(mediaType = "application/json", schema = @Schema(implementation = Note.class))),
             @ApiResponse(responseCode = "400", description = "请求参数无效", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
-            @ApiResponse(responseCode = "500", description = "服务器内部错误", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping("/range")
     public List<Note> getNotesBetween(
