@@ -3,9 +3,13 @@ package com.chalkim.orinote.service.impl;
 import java.time.Instant;
 import java.util.List;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 
 import com.chalkim.orinote.dao.NoteDao;
 import com.chalkim.orinote.dto.NoteCreateDto;
@@ -14,6 +18,7 @@ import com.chalkim.orinote.exception.NoteNotFoundException;
 import com.chalkim.orinote.model.Note;
 import com.chalkim.orinote.service.NoteService;
 
+@Validated
 @Service
 public class NoteServiceImpl implements NoteService {
     private final NoteDao noteDao;
@@ -24,12 +29,12 @@ public class NoteServiceImpl implements NoteService {
 
     @Override
     @Transactional
-    public Note saveNote(NoteCreateDto dto) {
+    public Note saveNote(@Valid @NotNull NoteCreateDto dto) {
         return noteDao.createNote(dto);
     }
 
     @Override
-    public Note getNoteById(Long id) {
+    public Note getNoteById(@NotNull Long id) {
         try {
             return noteDao.getNoteById(id);
         } catch (EmptyResultDataAccessException e) {
@@ -43,7 +48,7 @@ public class NoteServiceImpl implements NoteService {
     }
 
     @Override
-    public List<Note> getNotesBetween(Instant from, Instant to) {
+    public List<Note> getNotesBetween(@NotNull Instant from, @NotNull Instant to) {
         if (from.isAfter(to)) {
             throw new IllegalArgumentException("'from' must be before 'to'");
         }
@@ -52,7 +57,7 @@ public class NoteServiceImpl implements NoteService {
 
     @Override
     @Transactional
-    public void patchNote(Long id, NoteUpdateDto dto) {
+    public void patchNote(@NotNull Long id, @Valid @NotNull NoteUpdateDto dto) {
         boolean exists = noteDao.existsById(id);
         if (!exists) {
             throw new NoteNotFoundException("Note with ID " + id + " not found");
@@ -63,7 +68,7 @@ public class NoteServiceImpl implements NoteService {
 
     @Override
     @Transactional
-    public void softDeleteNote(Long id) {
+    public void softDeleteNote(@NotNull Long id) {
         int rows = noteDao.softDeleteNote(id);
         if (rows == 0) {
             throw new NoteNotFoundException("Note with ID " + id + " not found");

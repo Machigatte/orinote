@@ -35,9 +35,9 @@ import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 
+@Validated
 @RestController
 @RequestMapping("/summaries")
-@Validated
 @Tag(name = "Summary API", description = "管理总结的增删查改接口")
 public class SummaryController {
     private final SummaryService summaryService;

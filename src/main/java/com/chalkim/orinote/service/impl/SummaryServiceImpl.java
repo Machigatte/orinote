@@ -3,7 +3,9 @@ package com.chalkim.orinote.service.impl;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
+
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.prompt.Prompt;
@@ -13,6 +15,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 
 import com.chalkim.orinote.dao.SummaryDao;
 import com.chalkim.orinote.dto.SummaryCreateDto;
@@ -24,6 +27,7 @@ import com.chalkim.orinote.model.Summary;
 import com.chalkim.orinote.service.NoteService;
 import com.chalkim.orinote.service.SummaryService;
 
+@Validated
 @Service
 public class SummaryServiceImpl implements SummaryService {
     private final SummaryDao summaryDao;
@@ -63,7 +67,7 @@ public class SummaryServiceImpl implements SummaryService {
 
     @Override
     @Transactional
-    public Summary generateSummaryBetween(Instant from, Instant to) {
+    public Summary generateSummaryBetween(@NotNull Instant from, @NotNull Instant to) {
         if (from.isAfter(to)) {
             throw new IllegalArgumentException("'from' must be before 'to'");
         }
@@ -86,12 +90,12 @@ public class SummaryServiceImpl implements SummaryService {
 
     @Override
     @Transactional
-    public Summary saveSummary(SummaryCreateDto dto) {
+    public Summary saveSummary(@Valid @NotNull SummaryCreateDto dto) {
         return summaryDao.createSummary(dto);
     }
 
     @Override
-    public Summary getSummaryById(Long id) {
+    public Summary getSummaryById(@NotNull Long id) {
         try {
             return summaryDao.getSummaryById(id);
         } catch (EmptyResultDataAccessException e) {
@@ -101,7 +105,7 @@ public class SummaryServiceImpl implements SummaryService {
 
     @Override
     @Transactional
-    public void patchSummary(Long id, SummaryUpdateDto dto) {
+    public void patchSummary(@NotNull Long id, @Valid @NotNull SummaryUpdateDto dto) {
         boolean exists = summaryDao.existsById(id);
         if (!exists) {
             throw new SummaryNotFoundException("Summary with ID " + id + " not found");
@@ -112,7 +116,7 @@ public class SummaryServiceImpl implements SummaryService {
 
     @Override
     @Transactional
-    public void softDeleteSummary(Long id) {
+    public void softDeleteSummary(@NotNull Long id) {
         int rows = summaryDao.softDeleteSummary(id);
         if (rows == 0) {
             throw new SummaryNotFoundException("Summary with ID " + id + " not found");
@@ -120,7 +124,7 @@ public class SummaryServiceImpl implements SummaryService {
     }
 
     @Override
-    public List<Summary> getSummaryCreatedBetween(Instant from, Instant to) {
+    public List<Summary> getSummaryCreatedBetween(@NotNull Instant from, @NotNull Instant to) {
         if (from.isAfter(to)) {
             throw new IllegalArgumentException("'from' must be before 'to'");
         }
