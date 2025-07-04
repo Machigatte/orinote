@@ -56,7 +56,7 @@ public class SummaryController {
 
     @Operation(summary = "根据ID获取总结")
     @GetMapping("/{id}")
-    public Optional<Summary> getSummaryById(@PathVariable("id") Long id) {
+    public Summary getSummaryById(@PathVariable("id") Long id) {
         return summaryService.getSummaryById(id);
     }
 
@@ -68,7 +68,7 @@ public class SummaryController {
 
     @Operation(summary = "根据ID删除总结")
     @DeleteMapping("/{id}")
-    public void deleteSummary(@PathVariable("id") Long id) {
+    public void softDeleteSummary(@PathVariable("id") Long id) {
         summaryService.softDeleteSummary(id);
     }
 

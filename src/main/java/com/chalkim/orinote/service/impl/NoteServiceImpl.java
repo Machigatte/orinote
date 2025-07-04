@@ -2,14 +2,15 @@ package com.chalkim.orinote.service.impl;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.Optional;
 
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.chalkim.orinote.dao.NoteDao;
 import com.chalkim.orinote.dto.NoteCreateDto;
 import com.chalkim.orinote.dto.NoteUpdateDto;
+import com.chalkim.orinote.exception.NoteNotFoundException;
 import com.chalkim.orinote.model.Note;
 import com.chalkim.orinote.service.NoteService;
 
@@ -28,12 +29,11 @@ public class NoteServiceImpl implements NoteService {
     }
 
     @Override
-    public Optional<Note> getNoteById(Long id) {
-        Note note = noteDao.getNoteById(id);
-        if (note != null) {
-            return Optional.of(note);
-        } else {
-            return Optional.empty();
+    public Note getNoteById(Long id) {
+        try {
+            return noteDao.getNoteById(id);
+        } catch (EmptyResultDataAccessException e) {
+            throw new NoteNotFoundException("Note with ID " + id + " not found");
         }
     }
 
@@ -54,18 +54,16 @@ public class NoteServiceImpl implements NoteService {
         if (existingNote != null) {
             noteDao.updateNote(id, dto);
         } else {
-            throw new RuntimeException("Note not found");
+            throw new NoteNotFoundException("Note with ID " + id + " not found");
         }
     }
 
     @Override
     @Transactional
     public void softDeleteNote(Long id) {
-        Note note = noteDao.getNoteById(id);
-        if (note != null) {
-            noteDao.softDeleteNote(id);
-        } else {
-            throw new RuntimeException("Note not found");
+        int rows = noteDao.softDeleteNote(id);
+        if (rows == 0) {
+            throw new NoteNotFoundException("Note with ID " + id + " not found");
         }
     }
 }

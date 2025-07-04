@@ -1,12 +1,12 @@
 package com.chalkim.orinote.controller;
 
+import java.net.URI;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,14 +24,16 @@ import com.chalkim.orinote.model.Note;
 import com.chalkim.orinote.service.NoteService;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 @RestController
 @RequestMapping("/notes")
 @Tag(name = "Note API", description = "管理笔记的增删查改接口")
 public class NoteController {
-    private static final Logger log = LoggerFactory.getLogger(NoteController.class);
-
     private final NoteService noteService;
 
     public NoteController(NoteService noteService) {
@@ -40,6 +42,10 @@ public class NoteController {
 
     // GET /notes -> liot all notes
     @Operation(summary = "列出所有笔记")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "成功返回笔记列表"),
+            @ApiResponse(responseCode = "500", description = "服务器内部错误")
+    })
     @GetMapping
     public List<Note> getAllNotes() {
         return noteService.getAllNotes();
@@ -47,15 +53,22 @@ public class NoteController {
 
     // POST /notes -> create note
     @Operation(summary = "保存一个笔记")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "成功创建笔记"),
+            @ApiResponse(responseCode = "400", description = "请求参数无效", content = @Content(schema = @Schema(implementation = org.springframework.web.ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "服务器内部错误", content = @Content(schema = @Schema(implementation = org.springframework.web.ErrorResponse.class)))
+    })
     @PostMapping
-    public Note saveNote(@RequestBody @Validated NoteCreateDto dto) {
-        return noteService.saveNote(dto);
+    public ResponseEntity<Note> saveNote(@RequestBody @Validated NoteCreateDto dto) {
+        Note saved = noteService.saveNote(dto);
+        URI location = URI.create("/notes/" + saved.getId());
+        return ResponseEntity.created(location).body(saved);
     }
 
     // GET /notes/{id} -> get note by id
     @Operation(summary = "根据ID获取笔记")
     @GetMapping("/{id}")
-    public Optional<Note> getNotaById(@PathVariable("id") Long id) {
+    public Note getNotaById(@PathVariable("id") Long id) {
         return noteService.getNoteById(id);
     }
 
@@ -71,7 +84,7 @@ public class NoteController {
     // DELETE /notes/{id} -> delete note by id
     @Operation(summary = "根据ID删除笔记")
     @DeleteMapping("/{id}")
-    public void deleteNote(@PathVariable("id") Long id) {
+    public void softDeleteNote(@PathVariable("id") Long id) {
         noteService.softDeleteNote(id);
     }
 

@@ -10,12 +10,14 @@ import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.chat.prompt.SystemPromptTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.chalkim.orinote.dao.SummaryDao;
 import com.chalkim.orinote.dto.SummaryCreateDto;
 import com.chalkim.orinote.dto.SummaryUpdateDto;
+import com.chalkim.orinote.exception.SummaryNotFoundException;
 import com.chalkim.orinote.mapper.SummaryMapper;
 import com.chalkim.orinote.model.Note;
 import com.chalkim.orinote.model.Summary;
@@ -23,7 +25,7 @@ import com.chalkim.orinote.service.NoteService;
 import com.chalkim.orinote.service.SummaryService;
 
 @Service
-public class SummaryServiceImpl implements SummaryService{
+public class SummaryServiceImpl implements SummaryService {
     private final SummaryDao summaryDao;
 
     private final NoteService noteService;
@@ -34,8 +36,8 @@ public class SummaryServiceImpl implements SummaryService{
     @Value("classpath:/prompts/summarize-prompt.st")
     private Resource summarizePrompt;
 
-    public SummaryServiceImpl(SummaryDao summaryDao, NoteService noteService, ChatClient.Builder chatClientBuilder, 
-                              SummaryMapper summaryMapper) {
+    public SummaryServiceImpl(SummaryDao summaryDao, NoteService noteService, ChatClient.Builder chatClientBuilder,
+            SummaryMapper summaryMapper) {
         this.summaryDao = summaryDao;
         this.noteService = noteService;
         this.chatClient = chatClientBuilder.build();
@@ -45,10 +47,11 @@ public class SummaryServiceImpl implements SummaryService{
     private Summary generateSummary(List<Note> notes) {
         SystemPromptTemplate systemPromptTemplate = new SystemPromptTemplate(summarizePrompt);
 
-        Prompt prompt = systemPromptTemplate.create(Map.of("notes", notes));;
+        Prompt prompt = systemPromptTemplate.create(Map.of("notes", notes));
+        ;
 
         System.out.println("Prompt: " + prompt);
-        
+
         String content = this.chatClient.prompt(prompt).call().content();
 
         Summary summary = new Summary();
@@ -85,12 +88,11 @@ public class SummaryServiceImpl implements SummaryService{
     }
 
     @Override
-    public Optional<Summary> getSummaryById(Long id) {
-        Summary summary = summaryDao.getSummaryById(id);
-        if (summary != null) {
-            return Optional.of(summary);
-        } else {
-            return Optional.empty();
+    public Summary getSummaryById(Long id) {
+        try {
+            return summaryDao.getSummaryById(id);
+        } catch (EmptyResultDataAccessException e) {
+            throw new SummaryNotFoundException("Summary with ID " + id + " not found");
         }
     }
 
@@ -101,18 +103,16 @@ public class SummaryServiceImpl implements SummaryService{
         if (existingSummary != null) {
             summaryDao.updateSummary(id, dto);
         } else {
-            throw new RuntimeException("Summary not found");
+            throw new SummaryNotFoundException("Summary with ID " + id + " not found");
         }
     }
 
     @Override
     @Transactional
     public void softDeleteSummary(Long id) {
-        Summary summary = summaryDao.getSummaryById(id);
-        if (summary != null) {
-            summaryDao.softDeleteSummary(id);
-        } else {
-            throw new RuntimeException("Summary not found");
+        int rows = summaryDao.softDeleteSummary(id);
+        if (rows == 0) {
+            throw new SummaryNotFoundException("Summary with ID " + id + " not found");
         }
     }
 

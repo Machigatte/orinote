@@ -22,7 +22,7 @@ public interface NoteService {
      * @param id 笔记ID
      * @return 笔记对象
      */
-    Optional<Note> getNoteById(Long id);
+    Note getNoteById(Long id);
 
     /**
      * 获取所有笔记

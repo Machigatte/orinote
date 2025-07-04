@@ -28,7 +28,7 @@ public interface SummaryService {
      * @param id 总结的唯一标识符
      * @return 包含总结的 Optional 对象，如果不存在则返回空
      */
-    Optional<Summary> getSummaryById(Long id);
+    Summary getSummaryById(Long id);
 
     /**
      * 获取所有总结。
