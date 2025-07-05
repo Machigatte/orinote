@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.chalkim.orinote.dto.ScheduledJobDto;
 import com.chalkim.orinote.model.ScheduledJob;
 import com.chalkim.orinote.service.ScheduledJobService;
 
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.http.HttpStatus;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -73,8 +75,8 @@ public class ScheduledJobController {
     })
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ScheduledJob createJob(@RequestBody @Valid ScheduledJob job) {
-        return scheduledJobService.createJob(job.getJobName(), job.getCron());
+    public ScheduledJob createJob(@RequestBody @Valid ScheduledJobDto dto) {
+        return scheduledJobService.createJob(dto);
     }
 
     @Operation(summary = "更新定时任务", description = "根据ID更新指定的定时任务")
@@ -83,9 +85,9 @@ public class ScheduledJobController {
         @ApiResponse(responseCode = "400", description = "请求参数无效", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
         @ApiResponse(responseCode = "404", description = "定时任务未找到", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
     })
-    @PatchMapping("/{id}")
-    public void patchJob(@PathVariable("id") Long id, @RequestBody @Valid ScheduledJob job) {
-        scheduledJobService.patchJob(id, job.getJobName(), job.getCron());
+    @PutMapping("/{id}")
+    public void updateJob(@PathVariable("id") Long id, @RequestBody @Valid ScheduledJobDto dto) {
+        scheduledJobService.updateJob(id, dto);
     }
 
     @Operation(summary = "删除定时任务", description = "根据ID删除指定的定时任务")

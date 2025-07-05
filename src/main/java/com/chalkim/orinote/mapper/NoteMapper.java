@@ -10,5 +10,5 @@ import com.chalkim.orinote.model.Note;
 public interface NoteMapper {
     NoteMapper INSTANCE = Mappers.getMapper(NoteMapper.class);
 
-    NoteDto noteToNoteCreateDto(Note note);
+    NoteDto noteToNoteDto(Note note);
 }

@@ -56,7 +56,7 @@ public class NoteServiceImpl implements NoteService {
 
     @Override
     @Transactional
-    public void patchNote(@NotNull Long id, @Valid @NotNull NoteDto dto) {
+    public void updateNote(@NotNull Long id, @Valid @NotNull NoteDto dto) {
         boolean exists = noteDao.existsById(id);
         if (!exists) {
             throw new NoteNotFoundException("Note with ID " + id + " not found");

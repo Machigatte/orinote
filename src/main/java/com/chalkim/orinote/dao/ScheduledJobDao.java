@@ -6,6 +6,7 @@ import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import com.chalkim.orinote.dto.ScheduledJobDto;
 import com.chalkim.orinote.model.ScheduledJob;
 
 @Repository
@@ -43,15 +44,15 @@ public class ScheduledJobDao {
         return jdbc.query(sql, new BeanPropertyRowMapper<>(ScheduledJob.class));
     }
 
-    public ScheduledJob createJob(ScheduledJob job) {
+    public ScheduledJob createJob(ScheduledJobDto dto) {
         String sql = "INSERT INTO scheduled_jobs (job_name, cron, enabled) VALUES (?, ?, ?) RETURNING *";
         return jdbc.queryForObject(sql, new BeanPropertyRowMapper<>(ScheduledJob.class), 
-                                    job.getJobName(), job.getCron(), job.getEnabled());
+                                    dto.getJobName(), dto.getCron(), dto.getEnabled());
     }
 
-    public int updateJob(Long id, ScheduledJob job) {
+    public int updateJob(Long id, ScheduledJobDto dto) {
         String sql = "UPDATE scheduled_jobs SET job_name = COALESCE(?, job_name), cron = COALESCE(?, cron), enabled = COALESCE(?, enabled) WHERE id = ?";
-        return jdbc.update(sql, job.getJobName(), job.getCron(), job.getEnabled(), id);
+        return jdbc.update(sql, dto.getJobName(), dto.getCron(), dto.getEnabled(), id);
     }
 
     public int deleteJob(Long id) {

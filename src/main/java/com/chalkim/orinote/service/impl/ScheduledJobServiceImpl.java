@@ -3,8 +3,10 @@ package com.chalkim.orinote.service.impl;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.chalkim.orinote.dao.ScheduledJobDao;
+import com.chalkim.orinote.dto.ScheduledJobDto;
 import com.chalkim.orinote.exception.ScheduledJobNotFoundException;
 import com.chalkim.orinote.model.ScheduledJob;
 import com.chalkim.orinote.service.ScheduledJobService;
@@ -18,13 +20,10 @@ public class ScheduledJobServiceImpl implements ScheduledJobService{
         this.scheduledJobDao = scheduledJobDao;
     }
 
+    @Transactional
     @Override
-    public ScheduledJob createJob(String jobName, String cron) {
-        ScheduledJob job = new ScheduledJob();
-        job.setJobName(jobName);
-        job.setCron(cron);
-        job.setEnabled(true);
-        return scheduledJobDao.createJob(job);
+    public ScheduledJob createJob(ScheduledJobDto dto) {
+        return scheduledJobDao.createJob(dto);
     }
 
     @Override
@@ -50,17 +49,16 @@ public class ScheduledJobServiceImpl implements ScheduledJobService{
         return scheduledJobDao.getDisabledJobs();
     }
 
+    @Transactional
     @Override
-    public void patchJob(Long id, String jobName, String cron) {
+    public void updateJob(Long id, ScheduledJobDto dto) {
         if (!scheduledJobDao.existsById(id)) {
             throw new ScheduledJobNotFoundException("Scheduled job with ID " + id + " not found.");
         }
-        ScheduledJob job = scheduledJobDao.getJobById(id);
-        job.setJobName(jobName);
-        job.setCron(cron);
-        scheduledJobDao.updateJob(id, job);
+        scheduledJobDao.updateJob(id, dto);
     }
 
+    @Transactional
     @Override
     public void deleteJob(Long id) {
         if (!scheduledJobDao.existsById(id)) {
@@ -69,6 +67,7 @@ public class ScheduledJobServiceImpl implements ScheduledJobService{
         scheduledJobDao.deleteJob(id);
     }
 
+    @Transactional
     @Override
     public void enableJob(Long id) {
         if (!scheduledJobDao.existsById(id)) {
@@ -77,6 +76,7 @@ public class ScheduledJobServiceImpl implements ScheduledJobService{
         scheduledJobDao.enableJob(id);
     }
 
+    @Transactional
     @Override
     public void disableJob(Long id) {
         if (!scheduledJobDao.existsById(id)) {

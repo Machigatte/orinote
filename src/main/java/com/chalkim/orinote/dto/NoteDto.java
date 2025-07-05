@@ -7,5 +7,6 @@ import lombok.Data;
 public class NoteDto {
     @NotBlank
     private String title;
+    
     private String content;
 }

@@ -7,5 +7,6 @@ import lombok.Data;
 public class SummaryUpdateDto {
     @NotBlank
     private String title;
+    
     private String content;
 }

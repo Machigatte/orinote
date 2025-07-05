@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -99,10 +100,10 @@ public class SummaryController {
             @ApiResponse(responseCode = "400", description = "请求参数无效", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "404", description = "未找到指定ID的总结", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
     })
-    @PatchMapping("/{id}")
+    @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void patchSummary(@PathVariable("id") Long id, @RequestBody @Valid SummaryUpdateDto dto) {
-        summaryService.patchSummary(id, dto);
+    public void updateSummary(@PathVariable("id") Long id, @RequestBody @Valid SummaryUpdateDto dto) {
+        summaryService.updateSummary(id, dto);
     }
 
     @Operation(summary = "根据ID删除总结", description = "软删除指定ID的总结")

@@ -105,7 +105,7 @@ public class SummaryServiceImpl implements SummaryService {
 
     @Override
     @Transactional
-    public void patchSummary(@NotNull Long id, @Valid @NotNull SummaryUpdateDto dto) {
+    public void updateSummary(@NotNull Long id, @Valid @NotNull SummaryUpdateDto dto) {
         boolean exists = summaryDao.existsById(id);
         if (!exists) {
             throw new SummaryNotFoundException("Summary with ID " + id + " not found");

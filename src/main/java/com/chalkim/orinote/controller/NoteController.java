@@ -10,9 +10,9 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -45,7 +45,6 @@ public class NoteController {
         this.noteService = noteService;
     }
 
-    // GET /notes -> liot all notes
     @Operation(summary = "列出所有笔记")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "成功返回笔记列表", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = Note.class)))),
@@ -55,7 +54,6 @@ public class NoteController {
         return noteService.getAllNotes();
     }
 
-    // POST /notes -> create note
     @Operation(summary = "保存一个笔记")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "成功创建笔记", content = @Content(mediaType = "application/json", schema = @Schema(implementation = Note.class))),
@@ -72,7 +70,6 @@ public class NoteController {
         return ResponseEntity.created(location).body(saved);
     }
 
-    // GET /notes/{id} -> get note by id
     @Operation(summary = "根据ID获取笔记", description = "通过笔记ID获取笔记详情")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "成功返回笔记详情", content = @Content(mediaType = "application/json", schema = @Schema(implementation = Note.class))),
@@ -83,22 +80,20 @@ public class NoteController {
         return noteService.getNoteById(id);
     }
 
-    // POST /notes/{id} -> update note by id
     @Operation(summary = "根据ID更新笔记", description = "更新指定ID的笔记")
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "成功更新笔记"),
             @ApiResponse(responseCode = "400", description = "请求参数无效", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "404", description = "未找到指定ID的笔记", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
     })
-    @PatchMapping("/{id}")
+    @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateNote(
             @PathVariable("id") Long id,
             @RequestBody @Valid NoteDto dto) {
-        noteService.patchNote(id, dto);
+        noteService.updateNote(id, dto);
     }
 
-    // DELETE /notes/{id} -> delete note by id
     @Operation(summary = "根据ID删除笔记", description = "软删除指定ID的笔记")
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "成功删除笔记"),
@@ -109,7 +104,6 @@ public class NoteController {
         noteService.softDeleteNote(id);
     }
 
-    // GET /notes/range?from=...&to=... -> get notes in range
     @Operation(summary = "获取指定时间范围内的笔记", description = "返回指定时间范围内的笔记列表")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "成功返回笔记列表", content = @Content(mediaType = "application/json", schema = @Schema(implementation = Note.class))),
