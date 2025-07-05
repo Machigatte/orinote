@@ -56,4 +56,5 @@ public interface SummaryService {
      * @param id 总结的唯一标识符
      */
     void softDeleteSummary(Long id);
+
 }
