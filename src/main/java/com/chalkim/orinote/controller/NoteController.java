@@ -54,7 +54,7 @@ public class NoteController {
         return noteService.getAllNotes();
     }
 
-    @Operation(summary = "保存一个笔记")
+    @Operation(summary = "创建一个笔记")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "成功创建笔记", content = @Content(mediaType = "application/json", schema = @Schema(implementation = Note.class))),
             @ApiResponse(responseCode = "400", description = "请求参数无效", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),

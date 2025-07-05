@@ -10,7 +10,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -59,7 +58,7 @@ public class SummaryController {
         return summaryService.generateSummaryBetween(from, to);
     }
 
-    @Operation(summary = "保存一条总结", description = "创建一条新的总结并返回创建的总结")
+    @Operation(summary = "创建一条总结", description = "创建一条新的总结并返回创建的总结")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "成功创建总结", content = @Content(mediaType = "application/json", schema = @Schema(implementation = Summary.class))),
             @ApiResponse(responseCode = "400", description = "请求参数无效", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
