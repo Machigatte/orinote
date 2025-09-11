@@ -9,9 +9,16 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class Note {
     private Long id;
+    private Integer noteType;
     private String title;
-    private String content;
+
+    private String head;
+    private String body;
+    private String tail;
+    private String summary;
+
     private Boolean isDeleted;
+    private Instant achievedAt;
     private Instant createdAt;
     private Instant updatedAt;
 }

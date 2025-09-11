@@ -4,7 +4,7 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/orinote
     username: postgres
-    password: pmdy8PRHFHkJo9
+    password: alfeak
     driver-class-name: org.postgresql.Driver
   flyway:
     enabled: true

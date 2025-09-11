@@ -26,8 +26,8 @@ public class NoteDao {
     }
 
     public Note createNote(NoteDto dto) {
-        String sql = "INSERT INTO notes (title, content, is_deleted, created_at, updated_at) VALUES (?, ?, false, NOW(), NOW()) RETURNING *";
-        return jdbc.queryForObject(sql, new BeanPropertyRowMapper<>(Note.class), dto.getTitle(), dto.getContent());
+        String sql = "INSERT INTO notes (title, note_type, head, body, tail, summary, is_deleted, archived_at, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, false, null, NOW(), NOW()) RETURNING *";
+        return jdbc.queryForObject(sql, new BeanPropertyRowMapper<>(Note.class), dto.getTitle(), dto.getNoteType(), dto.getHead(), dto.getBody(), dto.getTail(), dto.getSummary());
     }
 
     public Note getNoteById(Long id) {
@@ -48,8 +48,10 @@ public class NoteDao {
     }
 
     public int updateNote(Long id, NoteDto dto) {
-        String sql = "UPDATE notes SET title = COALESCE(?, title), content = COALESCE(?, content), updated_at = NOW() WHERE id = ? AND is_deleted = false";
-        return jdbc.update(sql, dto.getTitle(), dto.getContent(), id);
+        //String sql = "UPDATE notes SET title = COALESCE(?, title), content = COALESCE(?, content), updated_at = NOW() WHERE id = ? AND is_deleted = false";
+        //String sql = "UPDATE notes SET title = ?, head = ?, body = ?, tail = ?, summary = ?, updated_at = NOW() WHERE id = ? AND is_deleted = false";
+        String sql = "UPDATE notes SET title = COALESCE(?, title), note_type = COALESCE(?, note_type), head = COALESCE(?, head), body = COALESCE(?, body), tail = COALESCE(?, tail), summary = COALESCE(?, summary), updated_at = NOW() WHERE id = ? AND is_deleted = false";
+        return jdbc.update(sql, dto.getTitle(), dto.getNoteType(), dto.getHead(), dto.getBody(), dto.getTail(), dto.getSummary(), id);
     }
 
     public int softDeleteNote(Long id) {

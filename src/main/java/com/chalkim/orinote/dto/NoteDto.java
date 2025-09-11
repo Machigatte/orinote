@@ -12,10 +12,10 @@ public class NoteDto {
         example = "我的第一篇笔记"
     )
     private String title;
+    private Integer noteType;
     
-    @Schema(
-        description = "笔记的内容。",
-        example = "这是我的第一篇笔记内容。"
-    )
-    private String content;
+    private String head;
+    private String body;
+    private String tail;
+    private String summary;
 }
