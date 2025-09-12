@@ -13,4 +13,4 @@ jobs:
     steps:
       - name: Deploy to Portainer
         run: |
-          curl -X POST ${{ secrets.ORINOTE_PORTAINER_WEBHOOK }}
+          curl -k -X POST ${{ secrets.ORINOTE_PORTAINER_WEBHOOK }}
