@@ -18,7 +18,7 @@ public class Note {
     private String summary;
 
     private Boolean isDeleted;
-    private Instant achievedAt;
+    private Instant archivedAt;
     private Instant createdAt;
     private Instant updatedAt;
 }
