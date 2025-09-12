@@ -8,6 +8,8 @@ spring:
     driver-class-name: org.postgresql.Driver
   flyway:
     enabled: true
+  jackson:
+    property-naming-strategy: SNAKE_CASE
   ai:
     openai:
       api-key: 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
