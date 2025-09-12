@@ -58,11 +58,6 @@ public class NoteDao {
     }
 
     public int updateNote(Long id, NoteDto dto) {
-        // String sql = "UPDATE notes SET title = COALESCE(?, title), content =
-        // COALESCE(?, content), updated_at = NOW() WHERE id = ? AND is_deleted =
-        // false";
-        // String sql = "UPDATE notes SET title = ?, head = ?, body = ?, tail = ?,
-        // summary = ?, updated_at = NOW() WHERE id = ? AND is_deleted = false";
         String sql = """
                 UPDATE notes SET
                   title = COALESCE(?, title),
