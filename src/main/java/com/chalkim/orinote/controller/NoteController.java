@@ -114,9 +114,10 @@ public class NoteController {
     })
     @PutMapping("/{id}/archive")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void archiveNote(
+    public ResponseEntity<Note> archiveNote(
             @PathVariable("id") Long id) {
-        noteService.archiveNote(id);
+        Note archivedNote = noteService.archiveNote(id);
+        return ResponseEntity.ok(archivedNote);
     }
 
     @Operation(summary = "根据ID删除笔记", description = "软删除指定ID的笔记")

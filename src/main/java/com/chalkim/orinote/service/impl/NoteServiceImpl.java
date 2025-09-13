@@ -97,14 +97,13 @@ public class NoteServiceImpl implements NoteService {
 
     @Override
     @Transactional
-
-    public void archiveNote(@NotNull Long id) {
+    public Note archiveNote(@NotNull Long id) {
         boolean exists = noteDao.existsById(id);
         if (!exists) {
             throw new NoteNotFoundException("Note with ID " + id + " not found");
         }
 
-        noteDao.archiveNote(id);
+        return noteDao.archiveNote(id);
     }
 
     @Override

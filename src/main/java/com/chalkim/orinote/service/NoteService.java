@@ -78,5 +78,5 @@ public interface NoteService {
      * 归档笔记
      * @param id 笔记的唯一标识符
      */
-    void archiveNote(Long id);
+    Note archiveNote(Long id);
 }

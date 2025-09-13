@@ -93,9 +93,9 @@ public class NoteDao {
                 id);
     }
 
-    public int archiveNote(Long id) {
-        String sql = "UPDATE notes SET archived_at = NOW() WHERE id = ?";
-        return jdbc.update(sql, id);
+    public Note archiveNote(Long id) {
+        String sql = "UPDATE notes SET archived_at = NOW() WHERE id = ? RETURNING *";
+        return jdbc.queryForObject(sql, new BeanPropertyRowMapper<>(Note.class), id);
     }
 
     public int updateArchivedAt(Long id, NoteDto dto) {
