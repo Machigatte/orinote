@@ -1,5 +1,6 @@
 package com.chalkim.orinote.controller;
 
+import com.chalkim.orinote.dto.SearchNoteDto;
 import java.net.URI;
 import java.time.Instant;
 import java.util.List;
@@ -95,6 +96,32 @@ public class NoteController {
         noteService.updateNote(id, dto);
     }
 
+    @Operation(summary = "根据ID分析笔记", description = "分析指定ID的笔记")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "成功分析笔记"),
+            @ApiResponse(responseCode = "400", description = "请求参数无效", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "未找到指定ID的笔记", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+    })
+    @PutMapping("/{id}/analyse")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void analyseNote(
+            @PathVariable("id") Long id) {
+        noteService.analyseNote(id);
+    }
+
+    @Operation(summary = "根据ID归档笔记", description = "归档指定ID的笔记")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "成功归档笔记"),
+            @ApiResponse(responseCode = "400", description = "请求参数无效", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "未找到指定ID的笔记", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+    })
+    @PutMapping("/{id}/archive")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void archiveNote(
+            @PathVariable("id") Long id) {
+        noteService.archiveNote(id);
+    }
+
     @Operation(summary = "根据ID删除笔记", description = "软删除指定ID的笔记")
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "成功删除笔记"),
@@ -105,16 +132,14 @@ public class NoteController {
         noteService.softDeleteNote(id);
     }
 
-    @Operation(summary = "获取指定时间范围内的笔记", description = "返回指定时间范围内的笔记列表")
+    @Operation(summary = "高级查询笔记", description = "根据时间范围、笔记类型和关键字查询笔记")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "成功返回笔记列表", content = @Content(mediaType = "application/json", schema = @Schema(implementation = Note.class))),
             @ApiResponse(responseCode = "400", description = "请求参数无效", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
     })
-    @GetMapping("/range")
-    public List<Note> getNotesBetween(
-            @RequestParam("from") @NotNull Instant from,
-            @RequestParam("to") @NotNull Instant to) {
-        return noteService.getNotesBetween(from, to);
+    @PutMapping("/search")
+    public List<Note> searchNotes(@RequestBody @Valid SearchNoteDto searchDto) {
+        return noteService.searchNotes(searchDto);
     }
 
     @Operation(summary = "归档笔记", description = "将指定ID的笔记归档")

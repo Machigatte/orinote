@@ -1,5 +1,6 @@
 package com.chalkim.orinote.service;
 
+import com.chalkim.orinote.dto.SearchNoteDto;
 import java.time.Instant;
 import java.util.List;
 
@@ -27,14 +28,16 @@ public interface NoteService {
      * @return 未被删除的笔记列表
      */
     List<Note> getAllNotes();
-
+    
     /**
-     * 获取指定时间范围内的笔记
-     * @param from 起始时间（必须早于结束时间）
-     * @param to 结束时间
-     * @return 指定时间范围内的笔记列表
+     * 高级查询笔记
+     * @param from 起始时间(可选)
+     * @param to 结束时间(可选)
+     * @param noteType 笔记类型(可选)
+     * @param keyword 搜索关键字(可选)
+     * @return 符合条件的笔记列表
      */
-    List<Note> getNotesBetween(Instant from, Instant to);
+    List<Note> searchNotes(SearchNoteDto searchDto);
 
     /**
      * 更新笔记
@@ -42,6 +45,12 @@ public interface NoteService {
      * @param updateDto 包含更新数据的 DTO 对象
      */
     void updateNote(Long id, NoteDto updateDto);
+
+    /**
+     * 分析笔记
+     * @param id 笔记的唯一标识符
+     */
+    void analyseNote(Long id);
 
     /**
      * 逻辑删除笔记
@@ -64,4 +73,10 @@ public interface NoteService {
 
      void analyseNote(Long id, NoteDto updateDto);
 
+
+    /**
+     * 归档笔记
+     * @param id 笔记的唯一标识符
+     */
+    void archiveNote(Long id);
 }

@@ -1,5 +1,6 @@
 package com.chalkim.orinote.service.impl;
 
+import com.chalkim.orinote.dto.SearchNoteDto;
 import java.time.Instant;
 import java.util.List;
 
@@ -47,12 +48,10 @@ public class NoteServiceImpl implements NoteService {
     }
 
     @Override
-    public List<Note> getNotesBetween(@NotNull Instant from, @NotNull Instant to) {
-        if (from.isAfter(to)) {
-            throw new IllegalArgumentException("'from' must be before 'to'");
-        }
-        return noteDao.getNotesCreatedBetween(from, to);
+    public List<Note> searchNotes(SearchNoteDto searchDto) {
+        return noteDao.searchNotes(searchDto);
     }
+
 
     @Override
     @Transactional
@@ -75,6 +74,18 @@ public class NoteServiceImpl implements NoteService {
         noteDao.updateArchivedAt(id, dto);
     }
 
+
+    @Override
+    @Transactional
+    public void analyseNote(@NotNull Long id) {
+        boolean exists = noteDao.existsById(id);
+        if (!exists) {
+            throw new NoteNotFoundException("Note with ID " + id + " not found");
+        }
+
+        noteDao.analyseNote(id);
+    }
+
     @Override
     @Transactional
     public void softDeleteNote(@NotNull Long id) {
@@ -82,6 +93,18 @@ public class NoteServiceImpl implements NoteService {
         if (rows == 0) {
             throw new NoteNotFoundException("Note with ID " + id + " not found");
         }
+    }
+
+    @Override
+    @Transactional
+
+    public void archiveNote(@NotNull Long id) {
+        boolean exists = noteDao.existsById(id);
+        if (!exists) {
+            throw new NoteNotFoundException("Note with ID " + id + " not found");
+        }
+
+        noteDao.archiveNote(id);
     }
 
     @Override
