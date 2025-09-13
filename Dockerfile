@@ -1,4 +1,15 @@
-# Use official OpenJDK 17 image
+# Node.js builder for frontend
+FROM node:18-alpine as node-builder
+
+# 安装 git
+RUN apk add --no-cache git
+
+# Clone and build frontend
+RUN git clone https://github.com/Machigatte/heartmanuscript.git /app/frontend
+WORKDIR /app/frontend
+RUN npm install && npm run build
+
+# Java builder
 FROM eclipse-temurin:17-jdk-jammy as builder
 
 # Set working directory
@@ -10,6 +21,11 @@ COPY gradle gradle
 COPY build.gradle .
 COPY settings.gradle .
 COPY src src
+
+RUN mkdir -p src/main/resources/static
+
+# Copy static files from frontend build
+COPY --from=node-builder /app/frontend/out src/main/resources/static
 
 RUN chmod +x ./gradlew
 
