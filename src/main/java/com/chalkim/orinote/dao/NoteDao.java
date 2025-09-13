@@ -78,8 +78,55 @@ public class NoteDao {
                 id);
     }
 
+    public int updateArchivedAt(Long id, NoteDto dto) {
+        String sql = """
+                UPDATE notes SET
+                  title = COALESCE(?, title),
+                  note_type = COALESCE(?, note_type),
+                  head = COALESCE(?, head),
+                  body = COALESCE(?, body),
+                  tail = COALESCE(?, tail),
+                  summary = COALESCE(?, summary),
+                  archived_at = NOW(),
+                  updated_at = NOW()
+                WHERE id = ? AND is_deleted = false
+                """;
+        return jdbc.update(sql,
+                dto.getTitle(),
+                dto.getNoteType(),
+                dto.getHead(),
+                dto.getBody(),
+                dto.getTail(),
+                dto.getSummary(),
+                id);
+    }
+
     public int softDeleteNote(Long id) {
         String sql = "UPDATE notes SET is_deleted = true, updated_at = NOW() WHERE id = ?";
         return jdbc.update(sql, id);
     }
+
+    public int analyseNote(Long id, NoteDto dto) {
+        String sql = """
+                UPDATE notes SET
+                  title = COALESCE(?, title),
+                  note_type = COALESCE(?, note_type),
+                  head = COALESCE(?, head),
+                  body = COALESCE(?, body),
+                  tail = COALESCE(?, tail),
+                  summary = COALESCE(?, summary),
+                  archived_at = NOW(),
+                  updated_at = NOW()
+                WHERE id = ? AND is_deleted = false
+                """;
+        return jdbc.update(sql,
+                dto.getTitle(),
+                dto.getNoteType(),
+                dto.getHead(),
+                dto.getBody(),
+                dto.getTail(),
+                dto.getSummary(),
+                id);
+    }
+
 }

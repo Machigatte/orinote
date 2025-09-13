@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+
 import com.chalkim.orinote.dto.NoteDto;
 import com.chalkim.orinote.model.Note;
 import com.chalkim.orinote.service.NoteService;
@@ -115,4 +116,31 @@ public class NoteController {
             @RequestParam("to") @NotNull Instant to) {
         return noteService.getNotesBetween(from, to);
     }
+
+    @Operation(summary = "归档笔记", description = "将指定ID的笔记归档")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "成功归档笔记"),
+            @ApiResponse(responseCode = "400", description = "请求参数无效", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "未找到指定ID的笔记", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+    })
+    @PutMapping("/{id}/archive")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void archiveNote(@PathVariable("id") Long id,
+                            @RequestBody @Valid NoteDto dto) {
+        noteService.archiveNote(id, dto);
+    }
+
+    @Operation(summary = "分析笔记", description = "分析指定ID的笔记内容")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "成功分析笔记"),
+            @ApiResponse(responseCode = "400", description = "请求参数无效", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "未找到指定ID的笔记", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))), 
+            })
+    @PutMapping("/{id}/analysis")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void analyseNote(@PathVariable("id") Long id,
+                            @RequestBody @Valid NoteDto dto) {
+        noteService.analyseNote(id, dto);
+    }
+
 }

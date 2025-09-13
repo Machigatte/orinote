@@ -67,10 +67,37 @@ public class NoteServiceImpl implements NoteService {
 
     @Override
     @Transactional
+    public void archiveNote(@NotNull Long id,  @Valid @NotNull NoteDto dto) {
+        boolean exists = noteDao.existsById(id);
+        if (!exists) {
+            throw new NoteNotFoundException("Note with ID " + id + " not found");
+        }
+        noteDao.updateArchivedAt(id, dto);
+    }
+
+    @Override
+    @Transactional
     public void softDeleteNote(@NotNull Long id) {
         int rows = noteDao.softDeleteNote(id);
         if (rows == 0) {
             throw new NoteNotFoundException("Note with ID " + id + " not found");
         }
+    }
+
+    @Override
+    @Transactional
+    public void analyseNote(@NotNull Long id,  @Valid @NotNull NoteDto dto) {
+        boolean exists = noteDao.existsById(id);
+        if (!exists) {
+            throw new NoteNotFoundException("Note with ID " + id + " not found");
+        }
+
+        // Generate prompt based on note type and content
+        String prompt = "Generate a summary for the following text: " + dto.getBody();
+        // Mock API call (to be replaced with Spring AI)
+        String analysisResult = "[MOCK] Analysis result for: " + prompt;
+        dto.setSummary(analysisResult);
+
+        noteDao.analyseNote(id, dto);
     }
 }
