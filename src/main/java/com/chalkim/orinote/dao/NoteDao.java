@@ -81,6 +81,23 @@ public class NoteDao {
                 id);
     }
 
+    public int analyseNote(Long id) {
+        String sql = """
+                UPDATE notes SET
+                  summary = COALESCE(?, summary),
+                  updated_at = NOW() WHERE id = ? AND is_deleted = false
+                """;
+
+        return jdbc.update(sql,
+                "分析中...",
+                id);
+    }
+
+    public int archiveNote(Long id) {
+        String sql = "UPDATE notes SET archived_at = NOW() WHERE id = ?";
+        return jdbc.update(sql, id);
+    }
+
     public int softDeleteNote(Long id) {
         String sql = "UPDATE notes SET is_deleted = true, updated_at = NOW() WHERE id = ?";
         return jdbc.update(sql, id);
