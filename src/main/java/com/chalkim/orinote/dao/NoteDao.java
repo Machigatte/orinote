@@ -3,7 +3,6 @@ package com.chalkim.orinote.dao;
 import com.chalkim.orinote.dto.SearchNoteDto;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.ArrayList;
 import java.time.Instant;
 import java.util.List;
 
