@@ -2,7 +2,6 @@ package com.chalkim.orinote.controller;
 
 import com.chalkim.orinote.dto.SearchNoteDto;
 import java.net.URI;
-import java.time.Instant;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
@@ -16,7 +15,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -31,10 +29,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 
 @Validated
 @RestController
@@ -78,7 +75,7 @@ public class NoteController {
             @ApiResponse(responseCode = "404", description = "未找到指定ID的笔记", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
     })
     @GetMapping("/{id}")
-    public Note getNotaById(@PathVariable("id") Long id) {
+    public Note getNotaById(@PathVariable Long id) {
         return noteService.getNoteById(id);
     }
 
@@ -140,19 +137,6 @@ public class NoteController {
     @PutMapping("/search")
     public List<Note> searchNotes(@RequestBody @Valid SearchNoteDto searchDto) {
         return noteService.searchNotes(searchDto);
-    }
-
-    @Operation(summary = "归档笔记", description = "将指定ID的笔记归档")
-    @ApiResponses({
-            @ApiResponse(responseCode = "204", description = "成功归档笔记"),
-            @ApiResponse(responseCode = "400", description = "请求参数无效", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
-            @ApiResponse(responseCode = "404", description = "未找到指定ID的笔记", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
-    })
-    @PutMapping("/{id}/archive")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void archiveNote(@PathVariable("id") Long id,
-                            @RequestBody @Valid NoteDto dto) {
-        noteService.archiveNote(id, dto);
     }
 
     @Operation(summary = "分析笔记", description = "分析指定ID的笔记内容")
