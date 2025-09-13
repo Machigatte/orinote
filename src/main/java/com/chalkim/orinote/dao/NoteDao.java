@@ -1,6 +1,9 @@
 package com.chalkim.orinote.dao;
 
+import com.chalkim.orinote.dto.SearchNoteDto;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.ArrayList;
 import java.time.Instant;
 import java.util.List;
 
@@ -81,5 +84,39 @@ public class NoteDao {
     public int softDeleteNote(Long id) {
         String sql = "UPDATE notes SET is_deleted = true, updated_at = NOW() WHERE id = ?";
         return jdbc.update(sql, id);
+    }
+
+    public List<Note> searchNotes(SearchNoteDto searchDto) {
+        StringBuilder sql = new StringBuilder("SELECT * FROM notes WHERE is_deleted = false");
+        List<Object> params = new ArrayList<>();
+
+        if (searchDto.getFrom() != null && searchDto.getTo() != null) {
+            sql.append(" AND created_at BETWEEN ? AND ?");
+            params.add(Timestamp.from(searchDto.getFrom()));
+            params.add(Timestamp.from(searchDto.getTo()));
+        } else if (searchDto.getFrom() != null) {
+            sql.append(" AND created_at >= ?");
+            params.add(Timestamp.from(searchDto.getFrom()));
+        } else if (searchDto.getTo() != null) {
+            sql.append(" AND created_at <= ?");
+            params.add(Timestamp.from(searchDto.getTo()));
+        }
+
+        if (searchDto.getNoteType() != null) {
+            sql.append(" AND note_type = ?");
+            params.add(searchDto.getNoteType());
+        }
+
+        if (searchDto.getKeyword() != null && !searchDto.getKeyword().isBlank()) {
+            sql.append(" AND (title LIKE ? OR head LIKE ? OR body LIKE ? OR tail LIKE ?)");
+            String likeKeyword = "%" + searchDto.getKeyword() + "%";
+            params.add(likeKeyword);
+            params.add(likeKeyword);
+            params.add(likeKeyword);
+            params.add(likeKeyword);
+        }
+
+        sql.append(" ORDER BY created_at DESC");
+        return jdbc.query(sql.toString(), new BeanPropertyRowMapper<>(Note.class), params.toArray());
     }
 }

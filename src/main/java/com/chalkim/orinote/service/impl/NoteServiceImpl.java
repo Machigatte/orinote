@@ -1,5 +1,6 @@
 package com.chalkim.orinote.service.impl;
 
+import com.chalkim.orinote.dto.SearchNoteDto;
 import java.time.Instant;
 import java.util.List;
 
@@ -46,13 +47,18 @@ public class NoteServiceImpl implements NoteService {
         return noteDao.getAllNotes();
     }
 
+    // @Override
+    // public List<Note> getNotesBetween(@NotNull Instant from, @NotNull Instant to) {
+    //     if (from.isAfter(to)) {
+    //         throw new IllegalArgumentException("'from' must be before 'to'");
+    //     }
+    //     return noteDao.getNotesCreatedBetween(from, to);
+    // }
     @Override
-    public List<Note> getNotesBetween(@NotNull Instant from, @NotNull Instant to) {
-        if (from.isAfter(to)) {
-            throw new IllegalArgumentException("'from' must be before 'to'");
-        }
-        return noteDao.getNotesCreatedBetween(from, to);
+    public List<Note> searchNotes(SearchNoteDto searchDto) {
+        return noteDao.searchNotes(searchDto);
     }
+
 
     @Override
     @Transactional
