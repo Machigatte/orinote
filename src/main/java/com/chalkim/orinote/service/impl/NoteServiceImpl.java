@@ -73,7 +73,6 @@ public class NoteServiceImpl implements NoteService {
         noteDao.updateArchivedAt(id, dto);
     }
 
-
     @Override
     @Transactional
     public void analyseNote(@NotNull Long id) {
