@@ -28,6 +28,12 @@ public class GlobalExceptionHandler {
         return ErrorResponse.create(ex, HttpStatus.BAD_REQUEST, ex.getMessage());
     }
 
+    @ExceptionHandler(ArchivedNoteException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ErrorResponse handleArchivedNote(ArchivedNoteException ex) {
+        return ErrorResponse.create(ex, HttpStatus.CONFLICT, ex.getMessage());
+    }
+
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ResponseEntity<ErrorResponse> handleException(Exception ex) {

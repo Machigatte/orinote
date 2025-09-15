@@ -27,6 +27,12 @@ public class NoteDao {
         return count != null && count > 0;
     }
 
+    public boolean isArchived(Long id) {
+        String sql = "SELECT COUNT(*) FROM notes WHERE id = ? AND archived_at IS NOT NULL";
+        Integer count = jdbc.queryForObject(sql, Integer.class, id);
+        return count != null && count > 0;
+    }
+
     public Note createNote(NoteDto dto) {
         String sql = """
                 INSERT INTO notes (title, note_type, head, body, tail, summary,

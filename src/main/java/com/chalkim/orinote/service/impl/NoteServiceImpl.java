@@ -13,6 +13,7 @@ import org.springframework.validation.annotation.Validated;
 
 import com.chalkim.orinote.dao.NoteDao;
 import com.chalkim.orinote.dto.NoteDto;
+import com.chalkim.orinote.exception.ArchivedNoteException;
 import com.chalkim.orinote.exception.NoteNotFoundException;
 import com.chalkim.orinote.mapper.NoteMapper;
 import com.chalkim.orinote.model.Note;
@@ -61,6 +62,11 @@ public class NoteServiceImpl implements NoteService {
         boolean exists = noteDao.existsById(id);
         if (!exists) {
             throw new NoteNotFoundException("Note with ID " + id + " not found");
+        }
+
+        boolean isArchived = noteDao.isArchived(id);
+        if (isArchived) {
+            throw new ArchivedNoteException("Cannot update archived note with ID " + id);
         }
 
         noteDao.updateNote(id, dto);
