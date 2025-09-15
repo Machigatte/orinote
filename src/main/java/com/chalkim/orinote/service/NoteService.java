@@ -69,9 +69,7 @@ public interface NoteService {
      * @param id 笔记ID
      * @param content 笔记内容
      */
-
-     void analyseNote(Long id, NoteDto updateDto);
-
+    void analyseNote(Long id, NoteDto updateDto);
 
     /**
      * 归档笔记

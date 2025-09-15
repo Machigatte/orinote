@@ -75,8 +75,9 @@ public class NoteController {
             @ApiResponse(responseCode = "404", description = "未找到指定ID的笔记", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
     })
     @GetMapping("/{id}")
-    public Note getNotaById(@PathVariable Long id) {
-        return noteService.getNoteById(id);
+    public ResponseEntity<Note> getNoteById(@PathVariable Long id) {
+        Note note = noteService.getNoteById(id);
+        return ResponseEntity.ok(note);
     }
 
     @Operation(summary = "根据ID更新笔记", description = "更新指定ID的笔记")
