@@ -14,6 +14,7 @@ import org.springframework.validation.annotation.Validated;
 import com.chalkim.orinote.dao.NoteDao;
 import com.chalkim.orinote.dto.NoteDto;
 import com.chalkim.orinote.exception.NoteNotFoundException;
+import com.chalkim.orinote.mapper.NoteMapper;
 import com.chalkim.orinote.model.Note;
 import com.chalkim.orinote.service.NoteService;
 
@@ -21,9 +22,11 @@ import com.chalkim.orinote.service.NoteService;
 @Service
 public class NoteServiceImpl implements NoteService {
     private final NoteDao noteDao;
+    private final NoteMapper noteMapper;
 
-    public NoteServiceImpl(NoteDao noteDao) {
+    public NoteServiceImpl(NoteDao noteDao, NoteMapper noteMapper) {
         this.noteDao = noteDao;
+        this.noteMapper = noteMapper;
     }
 
     @Override
@@ -75,13 +78,19 @@ public class NoteServiceImpl implements NoteService {
 
     @Override
     @Transactional
-    public void analyseNote(@NotNull Long id) {
-        boolean exists = noteDao.existsById(id);
-        if (!exists) {
+    public Note analyseNote(@NotNull Long id) {
+        try {
+            Note note = noteDao.getNoteById(id);
+            // Generate prompt based on note type and content
+            String prompt = "Generate a summary for the following text: " + note.getBody();
+            // Mock API call (to be replaced with Spring AI)
+            String analysisResult = "[MOCK] Analysis result for: " + prompt;
+            note.setSummary(analysisResult);
+            noteDao.updateNote(id, noteMapper.noteToNoteDto(note));
+            return note;
+        } catch (EmptyResultDataAccessException e) {
             throw new NoteNotFoundException("Note with ID " + id + " not found");
         }
-
-        noteDao.analyseNote(id);
     }
 
     @Override
@@ -102,22 +111,5 @@ public class NoteServiceImpl implements NoteService {
         }
 
         return noteDao.archiveNote(id);
-    }
-
-    @Override
-    @Transactional
-    public void analyseNote(@NotNull Long id,  @Valid @NotNull NoteDto dto) {
-        boolean exists = noteDao.existsById(id);
-        if (!exists) {
-            throw new NoteNotFoundException("Note with ID " + id + " not found");
-        }
-
-        // Generate prompt based on note type and content
-        String prompt = "Generate a summary for the following text: " + dto.getBody();
-        // Mock API call (to be replaced with Spring AI)
-        String analysisResult = "[MOCK] Analysis result for: " + prompt;
-        dto.setSummary(analysisResult);
-
-        noteDao.analyseNote(id, dto);
     }
 }

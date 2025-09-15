@@ -49,7 +49,7 @@ public interface NoteService {
      * 分析笔记
      * @param id 笔记的唯一标识符
      */
-    void analyseNote(Long id);
+    Note analyseNote(Long id);
 
     /**
      * 逻辑删除笔记
@@ -63,13 +63,6 @@ public interface NoteService {
      * @param updateDto 包含更新数据的 DTO 对象
      */
     void archiveNote(Long id, NoteDto updateDto);
-
-    /**
-     * 分析笔记内容
-     * @param id 笔记ID
-     * @param content 笔记内容
-     */
-    void analyseNote(Long id, NoteDto updateDto);
 
     /**
      * 归档笔记

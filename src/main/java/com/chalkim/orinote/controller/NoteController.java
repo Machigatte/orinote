@@ -102,9 +102,10 @@ public class NoteController {
     })
     @PutMapping("/{id}/analyse")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void analyseNote(
+    public ResponseEntity<Note> analyseNote(
             @PathVariable("id") Long id) {
-        noteService.analyseNote(id);
+        Note analysedNote = noteService.analyseNote(id);
+        return ResponseEntity.ok(analysedNote);
     }
 
     @Operation(summary = "根据ID归档笔记", description = "归档指定ID的笔记")
