@@ -140,18 +140,4 @@ public class NoteController {
     public List<Note> searchNotes(@RequestBody @Valid SearchNoteDto searchDto) {
         return noteService.searchNotes(searchDto);
     }
-
-    @Operation(summary = "分析笔记", description = "分析指定ID的笔记内容")
-    @ApiResponses({
-            @ApiResponse(responseCode = "204", description = "成功分析笔记"),
-            @ApiResponse(responseCode = "400", description = "请求参数无效", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
-            @ApiResponse(responseCode = "404", description = "未找到指定ID的笔记", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))), 
-            })
-    @PutMapping("/{id}/analysis")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void analyseNote(@PathVariable("id") Long id,
-                            @RequestBody @Valid NoteDto dto) {
-        noteService.analyseNote(id, dto);
-    }
-
 }

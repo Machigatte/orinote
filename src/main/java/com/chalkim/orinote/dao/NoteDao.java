@@ -80,18 +80,6 @@ public class NoteDao {
                 id);
     }
 
-    public int analyseNote(Long id) {
-        String sql = """
-                UPDATE notes SET
-                  summary = COALESCE(?, summary),
-                  updated_at = NOW() WHERE id = ? AND is_deleted = false
-                """;
-
-        return jdbc.update(sql,
-                "分析中...",
-                id);
-    }
-
     public Note archiveNote(Long id) {
         String sql = "UPDATE notes SET archived_at = NOW() WHERE id = ? RETURNING *";
         return jdbc.queryForObject(sql, new BeanPropertyRowMapper<>(Note.class), id);
