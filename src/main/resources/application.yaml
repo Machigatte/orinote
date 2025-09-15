@@ -17,3 +17,6 @@ spring:
       chat:
         options:
           model: meta-llama/llama-4-maverick:free
+
+server:
+  forward-headers-strategy: framework
