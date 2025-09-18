@@ -14,7 +14,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/v1/api")
 @Tag(name = "User API", description = "用户信息接口")
 public class UserController {
 

@@ -29,7 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RestController
-@RequestMapping("/admin/users")
+@RequestMapping("/api/v1/admin/users")
 @PreAuthorize("hasRole('ADMIN')")
 @Tag(name = "Admin User API", description = "管理员用户管理接口")
 public class AdminUserController {
@@ -70,7 +70,7 @@ public class AdminUserController {
         @ApiResponse(responseCode = "403", description = "权限不足")
     })
     @GetMapping("/{id}")
-    public User getUserById(@PathVariable Long id) {
+    public User getUserById(@PathVariable("id") Long id) {
         return userService.getUserById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));
     }
@@ -83,7 +83,7 @@ public class AdminUserController {
         @ApiResponse(responseCode = "403", description = "权限不足")
     })
     @PutMapping("/{id}")
-    public User updateUser(@PathVariable Long id, @Valid @RequestBody UserDto userDto) {
+    public User updateUser(@PathVariable("id") Long id, @Valid @RequestBody UserDto userDto) {
         log.info("Admin updating user: id={}, username={}", id, userDto.getUsername());
         return userService.updateUser(id, userDto);
     }
@@ -96,7 +96,7 @@ public class AdminUserController {
     })
     @PatchMapping("/{id}/disable")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void disableUser(@PathVariable Long id) {
+    public void disableUser(@PathVariable("id") Long id) {
         log.info("Admin disabling user: id={}", id);
         userService.setUserEnabled(id, false);
     }
@@ -109,7 +109,7 @@ public class AdminUserController {
     })
     @PatchMapping("/{id}/enable")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void enableUser(@PathVariable Long id) {
+    public void enableUser(@PathVariable("id") Long id) {
         log.info("Admin enabling user: id={}", id);
         userService.setUserEnabled(id, true);
     }
@@ -123,7 +123,7 @@ public class AdminUserController {
     })
     @PostMapping("/{id}/bind-github")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void bindGitHubAccount(@PathVariable Long id, @Valid @RequestBody BindGitHubDto bindDto) {
+    public void bindGitHubAccount(@PathVariable("id") Long id, @Valid @RequestBody BindGitHubDto bindDto) {
         log.info("Admin binding GitHub account: userId={}, providerUserId={}", id, bindDto.getProviderUserId());
         userService.bindGitHubAccount(id, bindDto.getProviderUserId());
     }
@@ -136,7 +136,7 @@ public class AdminUserController {
     })
     @DeleteMapping("/{id}/github-binding")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void unbindGitHubAccount(@PathVariable Long id) {
+    public void unbindGitHubAccount(@PathVariable("id") Long id) {
         log.info("Admin unbinding GitHub account: userId={}", id);
         userService.unbindGitHubAccount(id);
     }

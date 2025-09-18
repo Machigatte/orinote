@@ -1,6 +1,6 @@
 -- Insert sample admin user
 INSERT INTO users (username, email, role, enabled) 
-VALUES ('admin', 'admin@example.com', 'ROLE_ADMIN', true);
+VALUES ('Chalkim', 'jiangyi2012@outlook.com', 'ROLE_ADMIN', true);
 
 -- Insert sample regular user
 INSERT INTO users (username, email, role, enabled) 

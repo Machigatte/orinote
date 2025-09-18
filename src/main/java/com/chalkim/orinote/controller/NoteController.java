@@ -35,7 +35,7 @@ import io.swagger.v3.oas.annotations.media.ArraySchema;
 
 @Validated
 @RestController
-@RequestMapping("/notes")
+@RequestMapping("/api/v1/notes")
 @Tag(name = "Note API", description = "管理笔记的增删查改接口")
 public class NoteController {
     private final NoteService noteService;
@@ -75,7 +75,7 @@ public class NoteController {
             @ApiResponse(responseCode = "404", description = "未找到指定ID的笔记", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
     })
     @GetMapping("/{id}")
-    public ResponseEntity<Note> getNoteById(@PathVariable Long id) {
+    public ResponseEntity<Note> getNoteById(@PathVariable("id") Long id) {
         Note note = noteService.getNoteById(id);
         return ResponseEntity.ok(note);
     }
