@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orinote - 登录</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+        }
+        .login-container {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            text-align: center;
+            min-width: 320px;
+        }
+        .logo {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 1rem;
+        }
+        .subtitle {
+            color: #666;
+            margin-bottom: 2rem;
+        }
+        .login-btn {
+            background: #24292e;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            transition: background-color 0.2s;
+        }
+        .login-btn:hover {
+            background: #1a1e22;
+        }
+        .error {
+            background: #ffeaa7;
+            color: #d63031;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+        }
+        .info {
+            background: #e3f2fd;
+            color: #1976d2;
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 2rem;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="logo">📝 Orinote</div>
+        <div class="subtitle">私有笔记管理系统</div>
+        
+        <!-- Error Messages -->
+        <div th:if="${param.error}" class="error">
+            <div th:if="${param.error[0] == 'unauthorized_github_user'}">
+                您的 GitHub 账号未在本平台登记，请联系管理员。
+            </div>
+            <div th:if="${param.error[0] == 'account_disabled'}">
+                您的账号已被禁用，请联系管理员。
+            </div>
+            <div th:if="${param.error[0] == 'authentication_failed'}">
+                登录失败，请重试。
+            </div>
+        </div>
+        
+        <!-- GitHub Login Button -->
+        <a href="/oauth2/authorization/github" class="login-btn">
+            <svg style="width: 16px; height: 16px; margin-right: 8px; vertical-align: middle;" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12,2C6.477,2 2,6.484 2,12.017C2,16.624 5.865,20.374 10.839,21.515C11.339,21.603 11.521,21.296 11.521,21.034C11.521,20.799 11.513,20.134 11.508,19.262C7.84,20.016 7.237,17.652 7.237,17.652C6.784,16.338 6.104,16.035 6.104,16.035C5.168,15.259 6.18,15.27 6.18,15.27C7.224,15.347 7.761,16.428 7.761,16.428C8.68,18.086 10.174,17.634 11.54,17.379C11.628,16.716 11.896,16.266 12.191,16.02C9.284,15.77 6.223,14.851 6.223,10.712C6.223,9.472 6.599,8.464 7.784,7.678C7.675,7.428 7.318,6.344 7.883,4.87C7.883,4.87 8.735,4.603 11.498,6.137C12.338,5.926 13.228,5.821 14.115,5.817C15.002,5.821 15.892,5.926 16.733,6.137C19.494,4.603 20.345,4.87 20.345,4.87C20.911,6.344 20.554,7.428 20.445,7.678C21.632,8.464 22.006,9.472 22.006,10.712C22.006,14.863 18.943,15.767 16.029,16.011C16.411,16.33 16.719,16.958 16.719,17.918C16.719,19.32 16.707,20.453 16.707,20.803C16.707,21.069 16.886,21.38 17.394,21.514C22.37,20.37 26.233,16.622 26.233,12.017C26.233,6.484 21.756,2 16.233,2C14.153,2 12.233,2.544 10.682,3.493Z"></path>
+            </svg>
+            使用 GitHub 登录
+        </a>
+        
+        <div class="info">
+            ⚠️ 注意：只有预注册的 GitHub 账号可以登录本系统
+        </div>
+    </div>
+</body>
+</html>
