@@ -36,7 +36,7 @@ public class SecurityConfig {
                 .loginPage("/login")
                 .loginProcessingUrl("/login") // 处理登录表单提交的URL
                 .permitAll()
-                .defaultSuccessUrl("/home", true)
+                .defaultSuccessUrl("/", true)
             )
             .logout(logout -> logout
                 .logoutUrl("/logout")
