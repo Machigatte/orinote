@@ -9,6 +9,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.rememberme.InMemoryTokenRepositoryImpl;
+import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 
 @Configuration
 @EnableWebSecurity
@@ -40,6 +42,13 @@ public class SecurityConfig {
                 .logoutUrl("/logout")
                 .permitAll()
                 .logoutSuccessUrl("/login?logout")
+                .deleteCookies("JSESSIONID", "remember-me")
+            )
+            .rememberMe(rememberMe -> rememberMe
+                .tokenRepository(persistentTokenRepository())
+                .tokenValiditySeconds(86400*90) // 记住登录状态90天
+                .userDetailsService(userDetailsService)
+                .alwaysRemember(true) // 默认记住用户登录状态
             )
             .csrf(csrf -> csrf.disable()); // 在生产环境中应启用CSRF保护
         
@@ -50,5 +59,11 @@ public class SecurityConfig {
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
         auth.userDetailsService(userDetailsService)
             .passwordEncoder(passwordEncoder);
+    }
+    
+    @Bean
+    public PersistentTokenRepository persistentTokenRepository() {
+        // 使用内存中的令牌存储，不需要持久化到数据库
+        return new InMemoryTokenRepositoryImpl();
     }
 }
