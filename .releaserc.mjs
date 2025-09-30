@@ -2,7 +2,13 @@
  * @type {import('semantic-release').GlobalConfig}
  */
 export default {
-  branches: ["main", "master"],
+  branches: [
+    "main",
+    {
+      "name": "dev",
+      "prerelease": "beta"
+    }
+  ],
 
   plugins: [
     // 分析提交信息，决定下一个版本号 (major/minor/patch)
@@ -13,12 +19,7 @@ export default {
 
     // 核心插件：执行 Gradle 命令来管理版本号和部署
     ["@semantic-release/exec", {
-      // 在版本计算完成后，但在打 Git Tag 之前执行
-      // 这里的命令用于更新 gradle.properties 中的版本号
-      "prepareCmd": "echo \"version=${nextRelease.version}\" > gradle.properties && " +
-                    "git submodule update --init --recursive && " +
-                    "./gradlew build",
-        
+      "prepareCmd": "bash release-build.sh ${nextRelease.version}",
       "successCmd": "echo 'Semantic Release Successful!'"
     }],
 
@@ -36,8 +37,9 @@ export default {
     
     // 如果使用 GitHub，此插件会自动创建 Release Notes，并可以上传构建产物
     ["@semantic-release/github", {
+      prerelease: '${nextRelease.channel}',
       "assets": [
-        { "path": "build/libs/!(*-plain).jar", "label": "Application JAR" }
+        { "path": "build/libs/!(*-plain).jar" }
       ]
     }], 
     

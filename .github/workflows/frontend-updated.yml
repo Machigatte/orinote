@@ -1,9 +1,12 @@
-name: update-frontend
+name: Update Submodule & Push to Dev
 
 on:
   repository_dispatch:
     types: [frontend-updated]
   workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   update-submodule:
@@ -16,6 +19,7 @@ jobs:
           ref: dev
           submodules: recursive   # 确保子模块被初始化
           fetch-depth: 0          # 获取完整历史，方便 commit
+          persist-credentials: true
 
       # 2. 设置 Git 用户信息
       - name: Set git user
@@ -43,10 +47,13 @@ jobs:
             SUBMODULE_REPO_URL=${SUBMODULE_REPO_URL/git@github.com:/https://github.com/}
             SUBMODULE_REPO_URL=${SUBMODULE_REPO_URL/.git/}
           fi
+          
           cd ../../../
 
+          SUBMODULE_REPO_URL=${SUBMODULE_REPO_URL%.git}
           SUBMODULE_LINK="$SUBMODULE_REPO_URL/commit/$SUBMODULE_COMMIT"
-    
+          echo "Submodule latest commit link: $SUBMODULE_LINK"
+
           # 提交父项目更新，带上子模块 commit 信息
           git add src/main/frontend
           git commit -m "feat: update frontend to [$SUBMODULE_COMMIT]($SUBMODULE_LINK)" || echo "No changes to commit"
@@ -56,4 +63,3 @@ jobs:
         uses: ad-m/github-push-action@v1.0.0
         with:
           branch: dev
-          github_token: ${{ secrets._GITHUB_PAT }}
