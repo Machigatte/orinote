@@ -1,0 +1,55 @@
+name: update-frontend
+
+on:
+  repository_dispatch:
+    types: [frontend-updated]
+
+jobs:
+  update-submodule:
+    runs-on: ubuntu-latest
+    steps:
+      # 1. Checkout 父项目（包含子模块）
+      - name: Checkout repository
+        uses: actions/checkout@v5.0.0
+        with:
+          ref: dev
+          submodules: recursive   # 确保子模块被初始化
+          fetch-depth: 0          # 获取完整历史，方便 commit
+
+      # 2. 设置 Git 用户信息
+      - name: Set git user
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      # 3. 进入子模块，拉取 main 最新代码
+      - name: Update submodule to main
+        run: |
+          cd src/main/frontend
+          git fetch origin main
+          git checkout main
+          git pull origin main
+          cd ../../../                     # 回到父项目根目录
+
+      # 4. 更新父项目对子模块的指针，并带上子模块最新 commit 信息
+      - name: Commit submodule update
+        run: |
+          cd src/main/frontend
+          # 获取子模块 main 最新 commit hash
+          SUBMODULE_COMMIT=$(git rev-parse --short HEAD)
+          SUBMODULE_REPO_URL=$(git config --get remote.origin.url)
+          if [[ $SUBMODULE_REPO_URL == git@* ]]; then
+            SUBMODULE_REPO_URL=${SUBMODULE_REPO_URL/git@github.com:/https://github.com/}
+            SUBMODULE_REPO_URL=${SUBMODULE_REPO_URL/.git/}
+          fi
+          cd ../../../
+
+          SUBMODULE_LINK="$SUBMODULE_REPO_URL/commit/$SUBMODULE_COMMIT"
+    
+          # 提交父项目更新，带上子模块 commit 信息
+          git add src/main/frontend
+          git commit -m "feat: update frontend to [$SUBMODULE_COMMIT]($SUBMODULE_LINK)" || echo "No changes to commit"
+
+      # 5. 推送回远程仓库
+      - name: Push changes
+        uses: ad-m/github-push-action@v1.0.0
