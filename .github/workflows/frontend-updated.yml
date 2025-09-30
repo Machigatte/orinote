@@ -3,6 +3,7 @@ name: update-frontend
 on:
   repository_dispatch:
     types: [frontend-updated]
+  workflow_dispatch:
 
 jobs:
   update-submodule:
@@ -53,3 +54,5 @@ jobs:
       # 5. 推送回远程仓库
       - name: Push changes
         uses: ad-m/github-push-action@v1.0.0
+        with:
+          branch: dev
