@@ -38,3 +38,6 @@ out/
 .env
 
 src/main/resources/static/*
+
+### NodeJS ###
+node_modules/
