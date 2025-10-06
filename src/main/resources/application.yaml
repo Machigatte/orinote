@@ -21,6 +21,10 @@ spring:
 server:
   forward-headers-strategy: framework
 
+logging:
+  pattern:
+    level: "trace_id=%mdc{trace_id} span_id=%mdc{span_id} trace_flags=%mdc{trace_flags} %p"
+
 management:
   endpoints:
     web:
@@ -30,3 +34,10 @@ management:
     metrics:
       export:
         enabled: true
+
+  metrics:
+    distribution:
+      percentiles-histogram:
+        http:
+          server:
+            requests: 'true'
