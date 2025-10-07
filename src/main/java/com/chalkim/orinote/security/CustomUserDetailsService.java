@@ -20,8 +20,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Long userId = Long.parseLong(username);
-        User user = userService.findById(userId)
+        User user = userService.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("用户不存在: " + username));
         
         return new CustomUserDetails(user);

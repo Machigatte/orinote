@@ -6,6 +6,8 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -38,6 +40,16 @@ import io.swagger.v3.oas.annotations.media.ArraySchema;
 @RequestMapping("/api/notes")
 @Tag(name = "Note API", description = "管理笔记的增删查改接口")
 public class NoteController {
+    /**
+     * 获取当前登录用户的userId（与数据库主键关联）。
+     * 支持JwtAuthenticationFilter注入的principal为Long或String类型。
+     */
+    private Long getCurrentUserId() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Object principal = auth.getPrincipal();;
+        return Long.parseLong(principal.toString());
+    }
+
     private final NoteService noteService;
 
     public NoteController(NoteService noteService) {
@@ -50,7 +62,7 @@ public class NoteController {
     })
     @GetMapping
     public List<Note> getAllNotes() {
-        return noteService.getAllNotes();
+        return noteService.getAllNotes(getCurrentUserId());
     }
 
     @Operation(summary = "创建一个笔记")
@@ -60,7 +72,7 @@ public class NoteController {
     })
     @PostMapping
     public ResponseEntity<Note> saveNote(@RequestBody @Valid NoteDto dto) {
-        Note saved = noteService.saveNote(dto);
+        Note saved = noteService.saveNote(dto, getCurrentUserId());
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")
@@ -76,7 +88,7 @@ public class NoteController {
     })
     @GetMapping("/{id}")
     public ResponseEntity<Note> getNoteById(@PathVariable Long id) {
-        Note note = noteService.getNoteById(id);
+        Note note = noteService.getNoteById(id, getCurrentUserId());
         return ResponseEntity.ok(note);
     }
 
@@ -91,7 +103,7 @@ public class NoteController {
     public void updateNote(
             @PathVariable("id") Long id,
             @RequestBody @Valid NoteDto dto) {
-        noteService.updateNote(id, dto);
+        noteService.updateNote(id, getCurrentUserId(), dto);
     }
 
     @Operation(summary = "根据ID分析笔记", description = "分析指定ID的笔记")
@@ -104,7 +116,7 @@ public class NoteController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public ResponseEntity<Note> analyseNote(
             @PathVariable("id") Long id) {
-        Note analysedNote = noteService.analyseNote(id);
+        Note analysedNote = noteService.analyseNote(id, getCurrentUserId());
         return ResponseEntity.ok(analysedNote);
     }
 
@@ -118,7 +130,7 @@ public class NoteController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public ResponseEntity<Note> archiveNote(
             @PathVariable("id") Long id) {
-        Note archivedNote = noteService.archiveNote(id);
+        Note archivedNote = noteService.archiveNote(id, getCurrentUserId());
         return ResponseEntity.ok(archivedNote);
     }
 
@@ -129,7 +141,7 @@ public class NoteController {
     })
     @DeleteMapping("/{id}")
     public void softDeleteNote(@PathVariable("id") Long id) {
-        noteService.softDeleteNote(id);
+        noteService.softDeleteNote(id, getCurrentUserId());
     }
 
     @Operation(summary = "获取指定时间范围内的笔记", description = "返回指定时间范围内的笔记列表")
@@ -139,6 +151,6 @@ public class NoteController {
     })
     @PutMapping("/search")
     public List<Note> searchNotes(@RequestBody @Valid SearchNoteDto searchDto) {
-        return noteService.searchNotes(searchDto);
+        return noteService.searchNotes(getCurrentUserId(), searchDto);
     }
 }

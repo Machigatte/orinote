@@ -2,10 +2,10 @@ package com.chalkim.orinote.service;
 
 import com.chalkim.orinote.model.User;
 
+import java.util.Map;
 import java.util.Optional;
 
 public interface UserService {
-    
     /**
      * 根据用户名查询用户
      * 

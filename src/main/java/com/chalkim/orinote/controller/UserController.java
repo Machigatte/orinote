@@ -8,9 +8,10 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+
+import com.chalkim.orinote.dao.UserDao;
 import com.chalkim.orinote.security.JwtUtil;
 
 import java.security.Principal;
@@ -40,16 +41,16 @@ public class UserController {
     @GetMapping("/user")
     public Map<String, Object> getCurrentUser(@Parameter(hidden = true) Principal principal) {
         Map<String, Object> userInfo = new HashMap<>();
-        userInfo.put("username", principal.getName());
+        userInfo.put("user_id", principal.getName());
         return userInfo;
     }
 
     @Autowired
     private AuthenticationManager authenticationManager;
     @Autowired
-    private PasswordEncoder passwordEncoder;
-    @Autowired
     private JwtUtil jwtUtil;
+    @Autowired
+    private UserDao userDao;
 
     @Operation(
         summary = "用户登录，获取 JWT token",
@@ -79,7 +80,7 @@ public class UserController {
                 new UsernamePasswordAuthenticationToken(username, password)
             );
             // 登录成功，生成 JWT
-            String userId = authentication.getName();
+            String userId = userDao.findByUsername(username).get().getId().toString();
             String token = jwtUtil.generateToken(userId);
             return Collections.singletonMap("token", token);
         } catch (AuthenticationException e) {

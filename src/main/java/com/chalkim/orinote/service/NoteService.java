@@ -13,20 +13,20 @@ public interface NoteService {
      * @param dto 包含笔记数据的 DTO 对象
      * @return 创建的笔记对象
      */
-    Note saveNote(NoteDto dto);
+    Note saveNote(NoteDto dto, Long userId);
 
     /**
      * 根据ID获取笔记
      * @param id 笔记的唯一标识符
      * @return 如果找到，返回笔记对象；否则抛出异常
      */
-    Note getNoteById(Long id);
+    Note getNoteById(Long id, Long userId);
 
     /**
      * 获取所有笔记
      * @return 未被删除的笔记列表
      */
-    List<Note> getAllNotes();
+    List<Note> getAllNotes(Long userId);
     
     /**
      * 高级查询笔记
@@ -36,37 +36,37 @@ public interface NoteService {
      * @param keyword 搜索关键字(可选)
      * @return 符合条件的笔记列表
      */
-    List<Note> searchNotes(SearchNoteDto searchDto);
+    List<Note> searchNotes(Long userId, SearchNoteDto searchDto);
 
     /**
      * 更新笔记
      * @param id 笔记的唯一标识符
      * @param updateDto 包含更新数据的 DTO 对象
      */
-    void updateNote(Long id, NoteDto updateDto);
+    void updateNote(Long id, Long userId, NoteDto updateDto);
 
     /**
      * 分析笔记
      * @param id 笔记的唯一标识符
      */
-    Note analyseNote(Long id);
+    Note analyseNote(Long id, Long userId);
 
     /**
      * 逻辑删除笔记
      * @param id 笔记的唯一标识符
      */
-    void softDeleteNote(Long id);
+    void softDeleteNote(Long id, Long userId);
 
     /**
      * 归档笔记
      * @param id 笔记的唯一标识符
      * @param updateDto 包含更新数据的 DTO 对象
      */
-    void archiveNote(Long id, NoteDto updateDto);
+    void archiveNote(Long id, Long userId, NoteDto updateDto);
 
     /**
      * 归档笔记
      * @param id 笔记的唯一标识符
      */
-    Note archiveNote(Long id);
+    Note archiveNote(Long id, Long userId);
 }

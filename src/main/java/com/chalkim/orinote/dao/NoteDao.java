@@ -21,131 +21,135 @@ public class NoteDao {
         this.jdbc = jdbc;
     }
 
-    public boolean existsById(Long id) {
-        String sql = "SELECT COUNT(*) FROM notes WHERE id = ? AND is_deleted = false";
-        Integer count = jdbc.queryForObject(sql, Integer.class, id);
+    public boolean existsById(Long id, Long userId) {
+        String sql = "SELECT COUNT(*) FROM notes WHERE id = ? AND user_id = ? AND is_deleted = false";
+        Integer count = jdbc.queryForObject(sql, Integer.class, id, userId);
         return count != null && count > 0;
     }
 
-    public boolean isArchived(Long id) {
-        String sql = "SELECT COUNT(*) FROM notes WHERE id = ? AND archived_at IS NOT NULL";
-        Integer count = jdbc.queryForObject(sql, Integer.class, id);
+    public boolean isArchived(Long id, Long userId) {
+        String sql = "SELECT COUNT(*) FROM notes WHERE id = ? AND user_id = ? AND archived_at IS NOT NULL";
+        Integer count = jdbc.queryForObject(sql, Integer.class, id, userId);
         return count != null && count > 0;
     }
 
-    public Note createNote(NoteDto dto) {
-        String sql = """
-                INSERT INTO notes (title, note_type, head, body, tail, summary,
-                  is_deleted, archived_at, created_at, updated_at)
-                VALUES (?, ?, ?, ?, ?, ?,
-                  false, null, NOW(), NOW()) RETURNING *
-                """;
-        return jdbc.queryForObject(sql, new BeanPropertyRowMapper<>(Note.class),
-                dto.getTitle(), dto.getNoteType(), dto.getHead(), dto.getBody(), dto.getTail(), dto.getSummary());
+        public Note createNote(NoteDto dto, Long userId) {
+                String sql = """
+                                INSERT INTO notes (title, note_type, head, body, tail, summary, user_id,
+                                    is_deleted, archived_at, created_at, updated_at)
+                                VALUES (?, ?, ?, ?, ?, ?, ?,
+                                    false, null, NOW(), NOW()) RETURNING *
+                                """;
+                return jdbc.queryForObject(sql, new BeanPropertyRowMapper<>(Note.class),
+                                dto.getTitle(), dto.getNoteType(), dto.getHead(), dto.getBody(), dto.getTail(), dto.getSummary(), userId);
+        }
+
+    public Note getNoteById(Long id, Long userId) {
+        String sql = "SELECT * FROM notes WHERE id = ? AND user_id = ? AND is_deleted = false";
+        return jdbc.queryForObject(sql, new BeanPropertyRowMapper<>(Note.class), id, userId);
     }
 
-    public Note getNoteById(Long id) {
-        String sql = "SELECT * FROM notes WHERE id = ? AND is_deleted = false";
-        return jdbc.queryForObject(sql, new BeanPropertyRowMapper<>(Note.class), id);
+        public List<Note> getNotesCreatedBetween(Long userId, Instant from, Instant to) {
+                String sql = """
+                                SELECT * FROM notes
+                                WHERE user_id = ? AND created_at BETWEEN ? AND ? AND
+                                    is_deleted = false ORDER BY created_at DESC
+                                """;
+                Timestamp sqlFrom = Timestamp.from(from);
+                Timestamp sqlTo = Timestamp.from(to);
+                return jdbc.query(sql, new BeanPropertyRowMapper<>(Note.class), userId, sqlFrom, sqlTo);
+        }
+
+    public List<Note> getAllNotes(Long userId) {
+        String sql = "SELECT * FROM notes WHERE user_id = ? AND is_deleted = false ORDER BY created_at DESC";
+        return jdbc.query(sql, new BeanPropertyRowMapper<>(Note.class), userId);
     }
 
-    public List<Note> getNotesCreatedBetween(Instant from, Instant to) {
-        String sql = """
-                SELECT * FROM notes
-                WHERE created_at BETWEEN ? AND ? AND
-                  is_deleted = false ORDER BY created_at DESC
-                """;
-        Timestamp sqlFrom = Timestamp.from(from);
-        Timestamp sqlTo = Timestamp.from(to);
-        return jdbc.query(sql, new BeanPropertyRowMapper<>(Note.class), sqlFrom, sqlTo);
+    public int updateNote(Long id, Long userId, NoteDto dto) {
+    String sql = """
+        UPDATE notes SET
+          title = COALESCE(?, title),
+          note_type = COALESCE(?, note_type),
+          head = COALESCE(?, head),
+          body = COALESCE(?, body),
+          tail = COALESCE(?, tail),
+          summary = COALESCE(?, summary),
+          updated_at = NOW() WHERE id = ? AND user_id = ? AND is_deleted = false
+        """;
+    return jdbc.update(sql,
+        dto.getTitle(),
+        dto.getNoteType(),
+        dto.getHead(),
+        dto.getBody(),
+        dto.getTail(),
+        dto.getSummary(),
+        id,
+        userId);
     }
 
-    public List<Note> getAllNotes() {
-        String sql = "SELECT * FROM notes WHERE is_deleted = false ORDER BY created_at DESC";
-        return jdbc.query(sql, new BeanPropertyRowMapper<>(Note.class));
+    public Note archiveNote(Long id, Long userId) {
+        String sql = "UPDATE notes SET archived_at = NOW() WHERE id = ? AND user_id = ? RETURNING *";
+        return jdbc.queryForObject(sql, new BeanPropertyRowMapper<>(Note.class), id, userId);
     }
 
-    public int updateNote(Long id, NoteDto dto) {
-        String sql = """
-                UPDATE notes SET
-                  title = COALESCE(?, title),
-                  note_type = COALESCE(?, note_type),
-                  head = COALESCE(?, head),
-                  body = COALESCE(?, body),
-                  tail = COALESCE(?, tail),
-                  summary = COALESCE(?, summary),
-                  updated_at = NOW() WHERE id = ? AND is_deleted = false
-                """;
-        return jdbc.update(sql,
-                dto.getTitle(),
-                dto.getNoteType(),
-                dto.getHead(),
-                dto.getBody(),
-                dto.getTail(),
-                dto.getSummary(),
-                id);
+    public int updateArchivedAt(Long id, Long userId, NoteDto dto) {
+    String sql = """
+        UPDATE notes SET
+          title = COALESCE(?, title),
+          note_type = COALESCE(?, note_type),
+          head = COALESCE(?, head),
+          body = COALESCE(?, body),
+          tail = COALESCE(?, tail),
+          summary = COALESCE(?, summary),
+          archived_at = NOW(),
+          updated_at = NOW()
+        WHERE id = ? AND user_id = ? AND is_deleted = false
+        """;
+    return jdbc.update(sql,
+        dto.getTitle(),
+        dto.getNoteType(),
+        dto.getHead(),
+        dto.getBody(),
+        dto.getTail(),
+        dto.getSummary(),
+        id,
+        userId);
     }
 
-    public Note archiveNote(Long id) {
-        String sql = "UPDATE notes SET archived_at = NOW() WHERE id = ? RETURNING *";
-        return jdbc.queryForObject(sql, new BeanPropertyRowMapper<>(Note.class), id);
+    public int softDeleteNote(Long id, Long userId) {
+        String sql = "UPDATE notes SET is_deleted = true, updated_at = NOW() WHERE id = ? AND user_id = ?";
+        return jdbc.update(sql, id, userId);
     }
 
-    public int updateArchivedAt(Long id, NoteDto dto) {
-        String sql = """
-                UPDATE notes SET
-                  title = COALESCE(?, title),
-                  note_type = COALESCE(?, note_type),
-                  head = COALESCE(?, head),
-                  body = COALESCE(?, body),
-                  tail = COALESCE(?, tail),
-                  summary = COALESCE(?, summary),
-                  archived_at = NOW(),
-                  updated_at = NOW()
-                WHERE id = ? AND is_deleted = false
-                """;
-        return jdbc.update(sql,
-                dto.getTitle(),
-                dto.getNoteType(),
-                dto.getHead(),
-                dto.getBody(),
-                dto.getTail(),
-                dto.getSummary(),
-                id);
-    }
-
-    public int softDeleteNote(Long id) {
-        String sql = "UPDATE notes SET is_deleted = true, updated_at = NOW() WHERE id = ?";
-        return jdbc.update(sql, id);
-    }
-
-    public int analyseNote(Long id, NoteDto dto) {
-        String sql = """
-                UPDATE notes SET
-                  title = COALESCE(?, title),
-                  note_type = COALESCE(?, note_type),
-                  head = COALESCE(?, head),
-                  body = COALESCE(?, body),
-                  tail = COALESCE(?, tail),
-                  summary = COALESCE(?, summary),
-                  archived_at = NOW(),
-                  updated_at = NOW()
-                WHERE id = ? AND is_deleted = false
-                """;
-        return jdbc.update(sql,
-                dto.getTitle(),
-                dto.getNoteType(),
-                dto.getHead(),
-                dto.getBody(),
-                dto.getTail(),
-                dto.getSummary(),
-                id);
+    public int analyseNote(Long id, Long userId, NoteDto dto) {
+    String sql = """
+        UPDATE notes SET
+          title = COALESCE(?, title),
+          note_type = COALESCE(?, note_type),
+          head = COALESCE(?, head),
+          body = COALESCE(?, body),
+          tail = COALESCE(?, tail),
+          summary = COALESCE(?, summary),
+          archived_at = NOW(),
+          updated_at = NOW()
+        WHERE id = ? AND user_id = ? AND is_deleted = false
+        """;
+    return jdbc.update(sql,
+        dto.getTitle(),
+        dto.getNoteType(),
+        dto.getHead(),
+        dto.getBody(),
+        dto.getTail(),
+        dto.getSummary(),
+        id,
+        userId);
     }
 
 
-    public List<Note> searchNotes(SearchNoteDto searchDto) {
-        StringBuilder sql = new StringBuilder("SELECT * FROM notes WHERE is_deleted = false");
+    public List<Note> searchNotes(Long userId, SearchNoteDto searchDto) {
+        StringBuilder sql = new StringBuilder("SELECT * FROM notes WHERE user_id = ? AND is_deleted = false");
         List<Object> params = new ArrayList<>();
+        params.add(userId);
 
         if (searchDto.getFrom() != null && searchDto.getTo() != null) {
             sql.append(" AND created_at BETWEEN ? AND ?");

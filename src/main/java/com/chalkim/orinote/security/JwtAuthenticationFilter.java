@@ -20,8 +20,6 @@ import java.io.IOException;
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Autowired
-    private UserDetailsService userDetailsService;
-    @Autowired
     private JwtUtil jwtUtil;
 
     @Override
@@ -35,10 +33,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String token = header.substring(7);
             if (jwtUtil.isTokenValid(token)) {
                 Claims claims = jwtUtil.validateToken(token);
-                String username = claims.getSubject();
-                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+                String userId = claims.getSubject(); // JWT subject为userId
+                // 可选：如需权限可加载UserDetails，否则直接用userId
                 UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                        new UsernamePasswordAuthenticationToken(userId, null, null);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         }
