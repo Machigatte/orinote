@@ -2,7 +2,6 @@ package com.chalkim.orinote.dao.impl;
 
 import com.chalkim.orinote.dao.UserDao;
 import com.chalkim.orinote.model.User;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -31,7 +30,6 @@ public class UserDaoImpl implements UserDao {
         return user;
     };
 
-    @Autowired
     public UserDaoImpl(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
