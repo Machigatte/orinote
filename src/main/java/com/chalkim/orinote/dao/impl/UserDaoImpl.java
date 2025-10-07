@@ -62,11 +62,11 @@ public class UserDaoImpl implements UserDao {
     private User insert(User user) {
         String sql = "INSERT INTO users (username, passwd, created_at, updated_at) VALUES (?, ?, ?, ?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
-        
+
         Instant now = Instant.now();
         user.setCreatedAt(now);
         user.setUpdatedAt(now);
-        
+
         jdbcTemplate.update(connection -> {
             PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             ps.setString(1, user.getUsername());
@@ -75,8 +75,13 @@ public class UserDaoImpl implements UserDao {
             ps.setTimestamp(4, Timestamp.from(user.getUpdatedAt()));
             return ps;
         }, keyHolder);
-        
-        user.setId(keyHolder.getKey().longValue());
+
+        if (!keyHolder.getKeyList().isEmpty()) {
+            Object idObj = keyHolder.getKeyList().get(0).get("id");
+            if (idObj != null) {
+                user.setId(Long.parseLong(idObj.toString()));
+            }
+        }
         return user;
     }
 

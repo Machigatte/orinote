@@ -48,6 +48,8 @@ public class UserController {
     private AuthenticationManager authenticationManager;
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private JwtUtil jwtUtil;
 
     @Operation(
         summary = "用户登录，获取 JWT token",
@@ -77,7 +79,8 @@ public class UserController {
                 new UsernamePasswordAuthenticationToken(username, password)
             );
             // 登录成功，生成 JWT
-            String token = JwtUtil.generateToken(username);
+            String userId = authentication.getName();
+            String token = jwtUtil.generateToken(userId);
             return Collections.singletonMap("token", token);
         } catch (AuthenticationException e) {
             // 登录失败

@@ -1,10 +1,13 @@
 package com.chalkim.orinote.security;
 
 import io.jsonwebtoken.Claims;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -14,21 +17,24 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+@Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-    private final UserDetailsService userDetailsService;
-
-    public JwtAuthenticationFilter(UserDetailsService userDetailsService) {
-        this.userDetailsService = userDetailsService;
-    }
+    @Autowired
+    private UserDetailsService userDetailsService;
+    @Autowired
+    private JwtUtil jwtUtil;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-            throws ServletException, IOException {
+    protected void doFilterInternal(
+        @org.springframework.lang.NonNull HttpServletRequest request,
+        @org.springframework.lang.NonNull HttpServletResponse response,
+        @org.springframework.lang.NonNull FilterChain filterChain
+    ) throws ServletException, IOException {
         String header = request.getHeader("Authorization");
         if (StringUtils.hasText(header) && header.startsWith("Bearer ")) {
             String token = header.substring(7);
-            if (JwtUtil.isTokenValid(token)) {
-                Claims claims = JwtUtil.validateToken(token);
+            if (jwtUtil.isTokenValid(token)) {
+                Claims claims = jwtUtil.validateToken(token);
                 String username = claims.getSubject();
                 UserDetails userDetails = userDetailsService.loadUserByUsername(username);
                 UsernamePasswordAuthenticationToken authentication =

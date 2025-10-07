@@ -15,24 +15,22 @@ import com.chalkim.orinote.security.JwtAuthenticationFilter;
 import com.chalkim.orinote.security.OAuth2LoginSuccessHandler;
 import com.chalkim.orinote.service.impl.OAuth2UserServiceImpl;
 
+import lombok.AllArgsConstructor;
+
 import org.springframework.security.web.authentication.rememberme.InMemoryTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 import org.springframework.http.HttpMethod;
 
 @Configuration
 @EnableWebSecurity
+@AllArgsConstructor
 public class SecurityConfig {
 
     private final UserDetailsService userDetailsService;
     private final PasswordEncoder passwordEncoder;
     private final OAuth2UserServiceImpl customOAuth2UserService;
-    
-    public SecurityConfig(UserDetailsService userDetailsService, PasswordEncoder passwordEncoder,
-                          OAuth2UserServiceImpl customOAuth2UserService) {
-        this.userDetailsService = userDetailsService;
-        this.passwordEncoder = passwordEncoder;
-        this.customOAuth2UserService = customOAuth2UserService;
-    }
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -52,9 +50,9 @@ public class SecurityConfig {
                 .userInfoEndpoint(userInfo -> userInfo
                     .userService(customOAuth2UserService)
                 )
-                .successHandler(new OAuth2LoginSuccessHandler())
+                .successHandler(oAuth2LoginSuccessHandler)
             )
-            .addFilterBefore(new JwtAuthenticationFilter(userDetailsService), UsernamePasswordAuthenticationFilter.class);
+            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 

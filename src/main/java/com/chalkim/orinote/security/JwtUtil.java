@@ -4,37 +4,41 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import java.security.Key;
 import java.util.Date;
 
+@Component
 public class JwtUtil {
-    // 建议放到配置文件或环境变量
-    private static final String SECRET_KEY = "orinote-very-secret-key-should-be-long-and-random-2025";
+    @Value("${jwt.secret}")
+    private String secret;
     private static final long EXPIRATION = 1000 * 60 * 60 * 24; // 1天
-    private static final Key KEY = Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
 
-    // 生成 JWT
-    public static String generateToken(String username) {
+    // 生成 JWT，只和 user 表绑定
+    public String generateToken(String userId) {
+        Key key = Keys.hmacShaKeyFor(secret.getBytes());
         return Jwts.builder()
-                .setSubject(username)
+                .setSubject(userId)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION))
-                .signWith(KEY, SignatureAlgorithm.HS256)
+                .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }
 
     // 校验并解析 JWT
-    public static Claims validateToken(String token) {
+    public Claims validateToken(String token) {
+        Key key = Keys.hmacShaKeyFor(secret.getBytes());
         return Jwts.parserBuilder()
-                .setSigningKey(KEY)
+                .setSigningKey(key)
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
     }
 
     // 判断 token 是否有效
-    public static boolean isTokenValid(String token) {
+    public boolean isTokenValid(String token) {
         try {
             Claims claims = validateToken(token);
             return claims.getExpiration().after(new Date());
