@@ -33,5 +33,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Release
         env:
-          GITHUB_TOKEN: ${{ github.token }}
+          GITHUB_TOKEN: ${{ secrets._GITHUB_PAT }}
+          FRONTEND_OWNER: Machigatte
+          FRONTEND_REPO: heartmanuscript
         run: npx semantic-release
