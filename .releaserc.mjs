@@ -19,7 +19,7 @@ export default {
 
     // 核心插件：执行 Gradle 命令来管理版本号和部署
     ["@semantic-release/exec", {
-      "prepareCmd": "bash release-build.sh ${nextRelease.version}",
+      "prepareCmd": "bash release-build.sh ${nextRelease.version} ${nextRelease.channel ? '--prerelease' : ''}",
       "successCmd": "echo 'Semantic Release Successful!'"
     }],
 
