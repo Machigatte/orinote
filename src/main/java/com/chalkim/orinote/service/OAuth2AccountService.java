@@ -39,6 +39,8 @@ public class OAuth2AccountService {
     public String loginOrRegister(String provider, String idFromProvider, String usernameHint) {
         OAuth2UserAccount account = oauth2UserAccountDao.findByProviderAndId(provider, idFromProvider);
         Long userId;
+        // TODO: 如果当前已经了登录账号，绑定而不是创建新用户
+         // if (currentUserId != null) { ... }
         if (account != null) {
             userId = account.getUserId();
         } else {

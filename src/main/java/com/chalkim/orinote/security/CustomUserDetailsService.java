@@ -2,7 +2,6 @@ package com.chalkim.orinote.security;
 
 import com.chalkim.orinote.model.User;
 import com.chalkim.orinote.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -13,7 +12,6 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     private final UserService userService;
 
-    @Autowired
     public CustomUserDetailsService(UserService userService) {
         this.userService = userService;
     }
