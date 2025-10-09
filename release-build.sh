@@ -35,6 +35,6 @@ fi
 
 # 推送镜像
 docker push chalkim/orinote:${VERSION}
-if [ -n "$PRERELEASE" ]; then
+if [ -z "$PRERELEASE" ]; then
   docker push chalkim/orinote:latest
 fi
