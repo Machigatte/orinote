@@ -37,7 +37,7 @@ import io.swagger.v3.oas.annotations.media.ArraySchema;
 
 @Validated
 @RestController
-@RequestMapping("/api/notes")
+@RequestMapping("/api/v1/notes")
 @Tag(name = "Note API", description = "管理笔记的增删查改接口")
 public class NoteController {
     /**
