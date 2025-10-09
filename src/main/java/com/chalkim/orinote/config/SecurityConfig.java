@@ -65,12 +65,6 @@ public class SecurityConfig {
         auth.userDetailsService(userDetailsService)
             .passwordEncoder(passwordEncoder);
     }
-    
-    @Bean
-    public PersistentTokenRepository persistentTokenRepository() {
-        // 使用内存中的令牌存储，不需要持久化到数据库
-        return new InMemoryTokenRepositoryImpl();
-    }
 
     @Bean
     public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
