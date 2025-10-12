@@ -9,6 +9,7 @@ spring:
             client-id: ${GITHUB_CLIENT_ID}
             client-secret: ${GITHUB_CLIENT_SECRET}
             scope: profile, email
+            redirectUri: "{baseUrl}/api/v1/auth/oauth2/code/{registrationId}"
   datasource:
     url: ${DB_URL:jdbc:postgresql://localhost:5432/orinote}
     username: ${DB_USERNAME:postgres}
