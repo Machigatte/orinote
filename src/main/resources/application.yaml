@@ -15,16 +15,17 @@ spring:
     username: ${DB_USERNAME:postgres}
     password: ${DB_PASSWORD:orinote}
     driver-class-name: org.postgresql.Driver
+  flyway:
+    enabled: true
+    locations: classpath:db/migrations
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: validate
     show-sql: true
     properties:
       hibernate:
         format_sql: true
-  flyway:
-    enabled: true
   jackson:
     property-naming-strategy: SNAKE_CASE
   ai:
