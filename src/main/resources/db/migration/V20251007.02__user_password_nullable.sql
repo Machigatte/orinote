@@ -1,2 +1,0 @@
-ALTER TABLE "users"
-    ALTER COLUMN passwd DROP NOT NULL;
