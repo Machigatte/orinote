@@ -1,72 +1,57 @@
 package com.chalkim.orinote.service;
 
-import com.chalkim.orinote.dto.SearchNoteDto;
+import java.time.Instant;
 import java.util.List;
 
-import com.chalkim.orinote.dto.NoteDto;
+import com.chalkim.orinote.dto.note.CreateNoteDto;
+import com.chalkim.orinote.dto.note.UpdateNoteDto;
 import com.chalkim.orinote.model.Note;
+import com.chalkim.orinote.model.User;
 
 public interface NoteService {
 
     /**
      * 创建新的笔记
-     * @param dto 包含笔记数据的 DTO 对象
-     * @return 创建的笔记对象
      */
-    Note saveNote(NoteDto dto, Long userId);
+    Note createNote(CreateNoteDto dto, User user);
 
     /**
      * 根据ID获取笔记
-     * @param id 笔记的唯一标识符
-     * @return 如果找到，返回笔记对象；否则抛出异常
      */
-    Note getNoteById(Long id, Long userId);
+    Note getNoteById(Long id, User user);
 
     /**
      * 获取所有笔记
-     * @return 未被删除的笔记列表
      */
-    List<Note> getAllNotes(Long userId);
+    List<Note> getAllNotes(User user);
     
     /**
      * 高级查询笔记
      * @param from 起始时间(可选)
      * @param to 结束时间(可选)
-     * @param noteType 笔记类型(可选)
+     * @param type 笔记类型(可选)
      * @param keyword 搜索关键字(可选)
      * @return 符合条件的笔记列表
      */
-    List<Note> searchNotes(Long userId, SearchNoteDto searchDto);
+    List<Note> searchNotes(Instant from, Instant to, Integer type, String keyword, User user);
 
     /**
      * 更新笔记
-     * @param id 笔记的唯一标识符
-     * @param updateDto 包含更新数据的 DTO 对象
      */
-    void updateNote(Long id, Long userId, NoteDto updateDto);
+    Note updateNote(Long id, UpdateNoteDto dto, User user);
 
     /**
-     * 分析笔记
-     * @param id 笔记的唯一标识符
+     * 总结笔记
      */
-    Note analyseNote(Long id, Long userId);
+    Note summarizeNote(Long id, User user);
 
     /**
      * 逻辑删除笔记
-     * @param id 笔记的唯一标识符
      */
-    void softDeleteNote(Long id, Long userId);
+    void softDeleteNote(Long id, User user);
 
     /**
      * 归档笔记
-     * @param id 笔记的唯一标识符
-     * @param updateDto 包含更新数据的 DTO 对象
      */
-    void archiveNote(Long id, Long userId, NoteDto updateDto);
-
-    /**
-     * 归档笔记
-     * @param id 笔记的唯一标识符
-     */
-    Note archiveNote(Long id, Long userId);
+    Note archiveNote(Long id, User user);
 }

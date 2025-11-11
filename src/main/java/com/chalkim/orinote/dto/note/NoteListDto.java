@@ -1,4 +1,4 @@
-package com.chalkim.orinote.dto;
+package com.chalkim.orinote.dto.note;
 
 import java.time.Instant;
 
@@ -8,7 +8,16 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
-public class NoteDto {
+@Schema(description = "笔记 DTO")
+public class NoteListDto{
+
+    @NotNull
+    @Schema(
+        description = "笔记的唯一标识符",
+        example = "1"
+    )
+    private Long id;
+
     @NotBlank
     @Schema(
         description = "笔记的标题，用于标识和描述该笔记。",
@@ -18,14 +27,14 @@ public class NoteDto {
 
     @NotNull
     @Schema(
-        description = "笔记的类型，表示笔记的分类或格式。1=周报, 2=科研日记",
+        description = "笔记的类型，表示笔记的分类或格式。1=周报, 2=科研日记，3=随想",
         example = "1"
     )
-    private Integer noteType;
-    
-    private String head;
-    private String body;
-    private String tail;
-    private String summary;
+    private Integer type;
+
     private Instant archivedAt;
+    @NotNull
+    private Instant createdAt;
+    @NotNull
+    private Instant updatedAt;
 }

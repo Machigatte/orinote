@@ -1,6 +1,0 @@
--- CREATE TABLE scheduled_jobs (
---     id BIGSERIAL PRIMARY KEY,
---     job_name VARCHAR,
---     cron VARCHAR,
---     enabled BOOLEAN DEFAULT TRUE
--- );
