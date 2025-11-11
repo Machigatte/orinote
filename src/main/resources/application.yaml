@@ -1,19 +1,28 @@
 spring:
   application:
     name: orinote
+  mvc:
+    problemdetails:
+      enabled: true
   security:
     oauth2:
-      client:
-        registration:
-          github:
-            client-id: ${GITHUB_CLIENT_ID}
-            client-secret: ${GITHUB_CLIENT_SECRET}
-            scope: profile, email
+      resourceserver:
+        jwt:
+          issuer-uri: ${ISSUER_URI}
+
   datasource:
     url: ${DB_URL:jdbc:postgresql://localhost:5432/orinote}
     username: ${DB_USERNAME:postgres}
     password: ${DB_PASSWORD:orinote}
     driver-class-name: org.postgresql.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
   flyway:
     enabled: true
   jackson:
@@ -49,9 +58,3 @@ management:
         http:
           server:
             requests: 'true'
-
-jwt:
-  secret: orinote-very-secret-key-should-be-long-and-random-2025
-
-frontend:
-  url: ${FRONTEND_URL:http://localhost:3000}
