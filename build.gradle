@@ -47,7 +47,8 @@ dependencies {
 	annotationProcessor 'org.projectlombok:lombok'
 
 	// Spring AI OpenAI
-	implementation("org.springframework.ai:spring-ai-openai-spring-boot-starter:1.0.0-M6")
+	implementation 'org.springframework.ai:spring-ai-openai-spring-boot-starter:1.0.0-M6'
+	implementation 'org.springframework.ai:spring-ai-openai-spring-boot-starter'
 
 	// MapStruct for DTO mapping
 	implementation 'org.mapstruct:mapstruct:1.6.3'

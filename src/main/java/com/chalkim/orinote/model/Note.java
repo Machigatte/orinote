@@ -65,4 +65,18 @@ public class Note {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
+    public String toPrompt() {
+        StringBuilder sb = new StringBuilder();
+        return sb
+                .append("Title: ")
+                .append(title)
+                .append("Head: ")
+                .append(head)
+                .append("Body: ")
+                .append(body)
+                .append("Tail: ")
+                .append(tail)
+                .toString();
+    }
 }

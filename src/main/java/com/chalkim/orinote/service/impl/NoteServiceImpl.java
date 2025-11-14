@@ -6,6 +6,8 @@ import java.util.List;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
+import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -28,6 +30,7 @@ import lombok.RequiredArgsConstructor;
 public class NoteServiceImpl implements NoteService {
     private final NoteRepository noteRepository;
     private final NoteMapper noteMapper;
+    private final ChatModel chatModel;
 
     @Transactional
     public Note createNote(@Valid @NotNull CreateNoteDto dto, User user) {
@@ -91,7 +94,6 @@ public class NoteServiceImpl implements NoteService {
         note.setBody(dto.getBody());
         note.setTail(dto.getTail());
         note.setSummary(dto.getSummary());
-        System.out.println(note);
         return noteRepository.save(note);
     }
 
@@ -107,14 +109,21 @@ public class NoteServiceImpl implements NoteService {
 
     @Transactional
     public Note summarizeNote(@NotNull Long id, User user) {
+
         Note note = getNoteById(id, user);
+
         if (note.getArchivedAt() != null) {
             throw new ResourceConflictException("Cannot summarize an archived note");
         }
-        String prompt = "Generate a summary for the following text: " + note.getBody();
-        // Mock API call (to be replaced with Spring AI)
-        String analysisResult = "[MOCK] Analysis result for: " + prompt;
-        note.setSummary(analysisResult);
+
+        String result = ChatClient.create(chatModel).prompt()
+                .user(u -> u
+                        .text("请为下面文本生成中文分析：{note}")
+                        .param("note", note)
+                    )
+                .call()
+                .content();
+        note.setSummary(result);
         return noteRepository.save(note);
     }
 
