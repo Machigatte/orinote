@@ -7,6 +7,7 @@ import com.chalkim.orinote.dto.note.CreateNoteDto;
 import com.chalkim.orinote.dto.note.UpdateNoteDto;
 import com.chalkim.orinote.model.Note;
 import com.chalkim.orinote.model.User;
+import reactor.core.publisher.Flux;
 
 public interface NoteService {
 
@@ -44,6 +45,11 @@ public interface NoteService {
      * 总结笔记
      */
     Note summarizeNote(Long id, User user);
+
+    /**
+     * 总结笔记（流式）
+     */
+    Flux<String> summarizeNoteStream(Long id, User user);
 
     /**
      * 逻辑删除笔记

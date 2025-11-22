@@ -2,6 +2,7 @@ package com.chalkim.orinote.service.impl;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -23,6 +24,9 @@ import com.chalkim.orinote.repository.NoteRepository;
 import com.chalkim.orinote.service.NoteService;
 
 import lombok.RequiredArgsConstructor;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 @Validated
 @Service
@@ -72,7 +76,8 @@ public class NoteServiceImpl implements NoteService {
                         cb.like(root.get("title"), pattern),
                         cb.like(root.get("head"), pattern),
                         cb.like(root.get("body"), pattern),
-                        cb.like(root.get("tail"), pattern)
+                        cb.like(root.get("tail"), pattern),
+                        cb.like(root.get("summary"), pattern)
                 ));
             }
             query.orderBy(cb.desc(root.get("createdAt")));
@@ -125,6 +130,48 @@ public class NoteServiceImpl implements NoteService {
                 .content();
         note.setSummary(result);
         return noteRepository.save(note);
+    }
+
+    @Transactional
+    public Flux<String> summarizeNoteStream(@NotNull Long id, User user) {
+        Note note = getNoteById(id, user);
+        if (note.getArchivedAt() != null) {
+            throw new ResourceConflictException("Cannot summarize an archived note");
+        }
+
+        // 1. 创建原始的冷流 (Cold Stream)
+        Flux<String> rawChatStream = ChatClient.create(chatModel).prompt()
+                .user(u -> u
+                        .text("请为下面文本生成约200字的中文分析：{note} 输出格式为纯文本，不要使用markdown。")
+                        .param("note", note.toPrompt())
+                )
+                .stream()
+                .content();
+
+        // 2. 转换为热流 (Hot Stream)，需要两个订阅者才会启动
+        // autoConnect(2) 意味着只有当有两个订阅者准备好时，上游 (ChatClient) 才会启动。
+        Flux<String> sharedStream = rawChatStream.publish().autoConnect(2);
+
+        // --- 消费者 B：保存流 ---
+        // 3. 订阅流，收集内容，然后执行保存
+        Mono<Note> saveOperation = sharedStream
+                .collect(Collectors.joining())
+                .flatMap(fullSummary -> {
+                    note.setSummary(fullSummary);
+                    return Mono.fromCallable(() -> noteRepository.save(note))
+                            .subscribeOn(Schedulers.boundedElastic());
+                });
+
+        // 4. 立即订阅保存流，让它等待共享流启动
+        // 注意：这里的 .subscribe() 是非阻塞的。
+        saveOperation.subscribe(
+                savedNote -> System.out.println("Note saved successfully!"), // 成功回调
+                error -> System.err.println("Error saving note: " + error.getMessage()) // 错误处理
+        );
+
+        // --- 消费者 A：输出流 ---
+        // 5. 将共享流返回给 Controller，它将是第二个订阅者，从而触发上游启动。
+        return sharedStream;
     }
 
     @Transactional
